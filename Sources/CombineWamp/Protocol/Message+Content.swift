@@ -1,20 +1,45 @@
 import Foundation
 import FoundationExtensions
 
+public enum WampRole: String {
+    case publisher
+    case subscriber
+    case caller
+    case callee
+    case broker
+    case dealer
+}
+
+extension Dictionary where Key == String, Value == ElementType {
+    public static func roles(_ roles: Set<WampRole>) -> [String: ElementType] {
+        [
+            "roles": .dict(
+                Dictionary(
+                    uniqueKeysWithValues:
+                        roles
+                        .lazy
+                        .map(\.rawValue)
+                        .map { ($0, ElementType.dict([:])) }
+                )
+            )
+        ]
+    }
+}
+
 extension Message {
-    internal struct Hello: ElementTypeConvertible, Equatable {
-        internal init(realm: URI, details: [String : ElementType]) {
+    public struct Hello: ElementTypeConvertible, Equatable {
+        public init(realm: URI, details: [String: ElementType]) {
             self.realm = realm
             self.details = details
         }
 
         // [HELLO, Realm|uri, Details|dict]
-        internal static let type: MessageType = 1
-        internal let realm: URI
-        internal let details: [String: ElementType]
+        public static let type: MessageType = 1
+        public let realm: URI
+        public let details: [String: ElementType]
 
-        internal var asList: [ElementType] { [.integer(Self.type), .string(realm.description), .dict(details)] }
-        internal static func from(list: [ElementType]) -> Message.Hello? {
+        public var asList: [ElementType] { [.integer(Self.type), .string(realm.description), .dict(details)] }
+        public static func from(list: [ElementType]) -> Message.Hello? {
             guard list[safe: 0]?.integer == Self.type,
                   let realm = list[safe: 1]?.string.flatMap(URI.init(_:)),
                   let details = list[safe: 2]?.dict
@@ -23,19 +48,19 @@ extension Message {
         }
     }
 
-    internal struct Welcome: ElementTypeConvertible, Equatable {
-        internal init(session: WampID, details: [String : ElementType]) {
+    public struct Welcome: ElementTypeConvertible, Equatable {
+        public init(session: WampID, details: [String : ElementType]) {
             self.session = session
             self.details = details
         }
 
         // [WELCOME, Session|id, Details|dict]
-        internal static let type: MessageType = 2
-        internal let session: WampID
-        internal let details: [String: ElementType]
+        public static let type: MessageType = 2
+        public let session: WampID
+        public let details: [String: ElementType]
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(session.value), .dict(details)] }
-        internal static func from(list: [ElementType]) -> Message.Welcome? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(session.value), .dict(details)] }
+        public static func from(list: [ElementType]) -> Message.Welcome? {
             guard list[safe: 0]?.integer == Self.type,
                   let session = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let details = list[safe: 2]?.dict
@@ -44,19 +69,19 @@ extension Message {
         }
     }
 
-    internal struct Abort: ElementTypeConvertible, Equatable {
-        internal init(details: [String : ElementType], reason: URI) {
+    public struct Abort: ElementTypeConvertible, Equatable {
+        public init(details: [String : ElementType], reason: URI) {
             self.details = details
             self.reason = reason
         }
 
         // [ABORT, Details|dict, Reason|uri]
-        internal static let type: MessageType = 3
-        internal let details: [String: ElementType]
-        internal let reason: URI
+        public static let type: MessageType = 3
+        public let details: [String: ElementType]
+        public let reason: URI
 
-        internal var asList: [ElementType] { [.integer(Self.type), .dict(details), .string(reason.description)] }
-        internal static func from(list: [ElementType]) -> Message.Abort? {
+        public var asList: [ElementType] { [.integer(Self.type), .dict(details), .string(reason.description)] }
+        public static func from(list: [ElementType]) -> Message.Abort? {
             guard list[safe: 0]?.integer == Self.type,
                   let details = list[safe: 1]?.dict,
                   let reason = list[safe: 2]?.string.map({ URI.init(unverified: $0, isWildcard: false) })
@@ -65,19 +90,19 @@ extension Message {
         }
     }
 
-    internal struct Goodbye: ElementTypeConvertible, Equatable {
-        internal init(details: [String : ElementType], reason: URI) {
+    public struct Goodbye: ElementTypeConvertible, Equatable {
+        public init(details: [String : ElementType], reason: URI) {
             self.details = details
             self.reason = reason
         }
 
         // [GOODBYE, Details|dict, Reason|uri]
-        internal static let type: MessageType = 6
-        internal let details: [String: ElementType]
-        internal let reason: URI
+        public static let type: MessageType = 6
+        public let details: [String: ElementType]
+        public let reason: URI
 
-        internal var asList: [ElementType] { [.integer(Self.type), .dict(details), .string(reason.description)] }
-        internal static func from(list: [ElementType]) -> Message.Goodbye? {
+        public var asList: [ElementType] { [.integer(Self.type), .dict(details), .string(reason.description)] }
+        public static func from(list: [ElementType]) -> Message.Goodbye? {
             guard list[safe: 0]?.integer == Self.type,
                   let details = list[safe: 1]?.dict,
                   let reason = list[safe: 2]?.string.map({ URI.init(unverified: $0, isWildcard: false) })
@@ -86,8 +111,8 @@ extension Message {
         }
     }
 
-    internal struct WampError: ElementTypeConvertible, Equatable {
-        internal init(requestType: MessageType, request: WampID, details: [String : ElementType], error: URI, arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+    public struct WampError: ElementTypeConvertible, Equatable {
+        public init(requestType: MessageType, request: WampID, details: [String : ElementType], error: URI, arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
             self.requestType = requestType
             self.request = request
             self.details = details
@@ -99,16 +124,16 @@ extension Message {
         // [ERROR, REQUEST.Type|int, REQUEST.Request|id, Details|dict, Error|uri]
         // [ERROR, REQUEST.Type|int, REQUEST.Request|id, Details|dict, Error|uri, Arguments|list]
         // [ERROR, REQUEST.Type|int, REQUEST.Request|id, Details|dict, Error|uri, Arguments|list, ArgumentsKw|dict]
-        internal static let type: MessageType = 8
-        internal let requestType: MessageType
-        internal let request: WampID
-        internal let details: [String: ElementType]
-        internal let error: URI
-        internal let arguments: [ElementType]?
-        internal let argumentsKw: [String: ElementType]?
+        public static let type: MessageType = 8
+        public let requestType: MessageType
+        public let request: WampID
+        public let details: [String: ElementType]
+        public let error: URI
+        public let arguments: [ElementType]?
+        public let argumentsKw: [String: ElementType]?
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(requestType), .integer(request.value), .dict(details), .string(error.description), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
-        internal static func from(list: [ElementType]) -> Message.WampError? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(requestType), .integer(request.value), .dict(details), .string(error.description), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public static func from(list: [ElementType]) -> Message.WampError? {
             guard list[safe: 0]?.integer == Self.type,
                   let requestType = list[safe: 1]?.integer,
                   let request = list[safe: 2]?.integer.map(WampID.init(rawValue:)),
@@ -121,8 +146,8 @@ extension Message {
         }
     }
 
-    internal struct Publish: ElementTypeConvertible, Equatable {
-        internal init(request: WampID, options: [String : ElementType], topic: URI, arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+    public struct Publish: ElementTypeConvertible, Equatable {
+        public init(request: WampID, options: [String : ElementType], topic: URI, arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
             self.request = request
             self.options = options
             self.topic = topic
@@ -133,15 +158,15 @@ extension Message {
         // [PUBLISH, Request|id, Options|dict, Topic|uri]
         // [PUBLISH, Request|id, Options|dict, Topic|uri, Arguments|list]
         // [PUBLISH, Request|id, Options|dict, Topic|uri, Arguments|list, ArgumentsKw|dict]
-        internal static let type: MessageType = 16
-        internal let request: WampID
-        internal let options: [String: ElementType]
-        internal let topic: URI
-        internal let arguments: [ElementType]?
-        internal let argumentsKw: [String: ElementType]?
+        public static let type: MessageType = 16
+        public let request: WampID
+        public let options: [String: ElementType]
+        public let topic: URI
+        public let arguments: [ElementType]?
+        public let argumentsKw: [String: ElementType]?
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), .string(topic.description), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
-        internal static func from(list: [ElementType]) -> Message.Publish? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), .string(topic.description), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public static func from(list: [ElementType]) -> Message.Publish? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let options = list[safe: 2]?.dict,
@@ -153,19 +178,19 @@ extension Message {
         }
     }
 
-    internal struct Published: ElementTypeConvertible, Equatable {
-        internal init(request: WampID, publication: WampID) {
+    public struct Published: ElementTypeConvertible, Equatable {
+        public init(request: WampID, publication: WampID) {
             self.request = request
             self.publication = publication
         }
 
         // [PUBLISHED, PUBLISH.Request|id, Publication|id]
-        internal static let type: MessageType = 17
-        internal let request: WampID
-        internal let publication: WampID
+        public static let type: MessageType = 17
+        public let request: WampID
+        public let publication: WampID
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(publication.value)] }
-        internal static func from(list: [ElementType]) -> Message.Published? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(publication.value)] }
+        public static func from(list: [ElementType]) -> Message.Published? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let publication = list[safe: 2]?.integer.map(WampID.init(rawValue:))
@@ -174,21 +199,21 @@ extension Message {
         }
     }
 
-    internal struct Subscribe: ElementTypeConvertible, Equatable {
-        internal init(request: WampID, options: [String : ElementType], topic: URI) {
+    public struct Subscribe: ElementTypeConvertible, Equatable {
+        public init(request: WampID, options: [String : ElementType], topic: URI) {
             self.request = request
             self.options = options
             self.topic = topic
         }
 
         // [SUBSCRIBE, Request|id, Options|dict, Topic|uri]
-        internal static let type: MessageType = 32
-        internal let request: WampID
-        internal let options: [String: ElementType]
-        internal let topic: URI
+        public static let type: MessageType = 32
+        public let request: WampID
+        public let options: [String: ElementType]
+        public let topic: URI
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), .string(topic.description)] }
-        internal static func from(list: [ElementType]) -> Message.Subscribe? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), .string(topic.description)] }
+        public static func from(list: [ElementType]) -> Message.Subscribe? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let options = list[safe: 2]?.dict,
@@ -198,19 +223,19 @@ extension Message {
         }
     }
 
-    internal struct Subscribed: ElementTypeConvertible, Equatable {
-        internal init(request: WampID, subscription: WampID) {
+    public struct Subscribed: ElementTypeConvertible, Equatable {
+        public init(request: WampID, subscription: WampID) {
             self.request = request
             self.subscription = subscription
         }
 
         // [SUBSCRIBED, SUBSCRIBE.Request|id, Subscription|id]
-        internal static let type: MessageType = 33
-        internal let request: WampID
-        internal let subscription: WampID
+        public static let type: MessageType = 33
+        public let request: WampID
+        public let subscription: WampID
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(subscription.value)] }
-        internal static func from(list: [ElementType]) -> Message.Subscribed? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(subscription.value)] }
+        public static func from(list: [ElementType]) -> Message.Subscribed? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let subscription = list[safe: 2]?.integer.map(WampID.init(rawValue:))
@@ -219,19 +244,19 @@ extension Message {
         }
     }
 
-    internal struct Unsubscribe: ElementTypeConvertible, Equatable {
-        internal init(request: WampID, subscription: WampID) {
+    public struct Unsubscribe: ElementTypeConvertible, Equatable {
+        public init(request: WampID, subscription: WampID) {
             self.request = request
             self.subscription = subscription
         }
 
         // [UNSUBSCRIBE, Request|id, SUBSCRIBED.Subscription|id]
-        internal static let type: MessageType = 34
-        internal let request: WampID
-        internal let subscription: WampID
+        public static let type: MessageType = 34
+        public let request: WampID
+        public let subscription: WampID
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(subscription.value)] }
-        internal static func from(list: [ElementType]) -> Message.Unsubscribe? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(subscription.value)] }
+        public static func from(list: [ElementType]) -> Message.Unsubscribe? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let subscription = list[safe: 2]?.integer.map(WampID.init(rawValue:))
@@ -240,17 +265,17 @@ extension Message {
         }
     }
 
-    internal struct Unsubscribed: ElementTypeConvertible, Equatable {
-        internal init(request: WampID) {
+    public struct Unsubscribed: ElementTypeConvertible, Equatable {
+        public init(request: WampID) {
             self.request = request
         }
 
         // [UNSUBSCRIBED, UNSUBSCRIBE.Request|id]
-        internal static let type: MessageType = 35
-        internal let request: WampID
+        public static let type: MessageType = 35
+        public let request: WampID
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value)] }
-        internal static func from(list: [ElementType]) -> Message.Unsubscribed? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value)] }
+        public static func from(list: [ElementType]) -> Message.Unsubscribed? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:))
             else { return nil }
@@ -258,8 +283,8 @@ extension Message {
         }
     }
 
-    internal struct Event: ElementTypeConvertible, Equatable {
-        internal init(subscription: WampID, publication: WampID, details: [String : ElementType], arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+    public struct Event: ElementTypeConvertible, Equatable {
+        public init(subscription: WampID, publication: WampID, details: [String : ElementType], arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
             self.subscription = subscription
             self.publication = publication
             self.details = details
@@ -270,15 +295,15 @@ extension Message {
         // [EVENT, SUBSCRIBED.Subscription|id, PUBLISHED.Publication|id, Details|dict]
         // [EVENT, SUBSCRIBED.Subscription|id, PUBLISHED.Publication|id, Details|dict, PUBLISH.Arguments|list]
         // [EVENT, SUBSCRIBED.Subscription|id, PUBLISHED.Publication|id, Details|dict, PUBLISH.Arguments|list, PUBLISH.ArgumentsKw|dict]
-        internal static let type: MessageType = 36
-        internal let subscription: WampID
-        internal let publication: WampID
-        internal let details: [String: ElementType]
-        internal let arguments: [ElementType]?
-        internal let argumentsKw: [String: ElementType]?
+        public static let type: MessageType = 36
+        public let subscription: WampID
+        public let publication: WampID
+        public let details: [String: ElementType]
+        public let arguments: [ElementType]?
+        public let argumentsKw: [String: ElementType]?
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(subscription.value), .integer(publication.value), .dict(details), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
-        internal static func from(list: [ElementType]) -> Message.Event? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(subscription.value), .integer(publication.value), .dict(details), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public static func from(list: [ElementType]) -> Message.Event? {
             guard list[safe: 0]?.integer == Self.type,
                   let subscription = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let publication = list[safe: 2]?.integer.map(WampID.init(rawValue:)),
@@ -290,8 +315,8 @@ extension Message {
         }
     }
 
-    internal struct Call: ElementTypeConvertible, Equatable {
-        internal init(request: WampID, options: [String : ElementType], procedure: URI, arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+    public struct Call: ElementTypeConvertible, Equatable {
+        public init(request: WampID, options: [String : ElementType], procedure: URI, arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
             self.request = request
             self.options = options
             self.procedure = procedure
@@ -302,15 +327,15 @@ extension Message {
         // [CALL, Request|id, Options|dict, Procedure|uri]
         // [CALL, Request|id, Options|dict, Procedure|uri, Arguments|list]
         // [CALL, Request|id, Options|dict, Procedure|uri, Arguments|list, ArgumentsKw|dict]
-        internal static let type: MessageType = 48
-        internal let request: WampID
-        internal let options: [String: ElementType]
-        internal let procedure: URI
-        internal let arguments: [ElementType]?
-        internal let argumentsKw: [String: ElementType]?
+        public static let type: MessageType = 48
+        public let request: WampID
+        public let options: [String: ElementType]
+        public let procedure: URI
+        public let arguments: [ElementType]?
+        public let argumentsKw: [String: ElementType]?
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), .string(procedure.description), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
-        internal static func from(list: [ElementType]) -> Message.Call? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), .string(procedure.description), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public static func from(list: [ElementType]) -> Message.Call? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let options = list[safe: 2]?.dict,
@@ -322,8 +347,8 @@ extension Message {
         }
     }
 
-    internal struct Result: ElementTypeConvertible, Equatable {
-        internal init(request: WampID, details: [String : ElementType], arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+    public struct Result: ElementTypeConvertible, Equatable {
+        public init(request: WampID, details: [String : ElementType], arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
             self.request = request
             self.details = details
             self.arguments = arguments
@@ -333,14 +358,14 @@ extension Message {
         // [RESULT, CALL.Request|id, Details|dict]
         // [RESULT, CALL.Request|id, Details|dict, YIELD.Arguments|list]
         // [RESULT, CALL.Request|id, Details|dict, YIELD.Arguments|list, YIELD.ArgumentsKw|dict]
-        internal static let type: MessageType = 50
-        internal let request: WampID
-        internal let details: [String: ElementType]
-        internal let arguments: [ElementType]?
-        internal let argumentsKw: [String: ElementType]?
+        public static let type: MessageType = 50
+        public let request: WampID
+        public let details: [String: ElementType]
+        public let arguments: [ElementType]?
+        public let argumentsKw: [String: ElementType]?
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(details), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
-        internal static func from(list: [ElementType]) -> Message.Result? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(details), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public static func from(list: [ElementType]) -> Message.Result? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let details = list[safe: 2]?.dict
@@ -351,21 +376,21 @@ extension Message {
         }
     }
 
-    internal struct Register: ElementTypeConvertible, Equatable {
-        internal init(request: WampID, options: [String : ElementType], procedure: URI) {
+    public struct Register: ElementTypeConvertible, Equatable {
+        public init(request: WampID, options: [String : ElementType], procedure: URI) {
             self.request = request
             self.options = options
             self.procedure = procedure
         }
 
         // [REGISTER, Request|id, Options|dict, Procedure|uri]
-        internal static let type: MessageType = 64
-        internal let request: WampID
-        internal let options: [String: ElementType]
-        internal let procedure: URI
+        public static let type: MessageType = 64
+        public let request: WampID
+        public let options: [String: ElementType]
+        public let procedure: URI
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), .string(procedure.description)] }
-        internal static func from(list: [ElementType]) -> Message.Register? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), .string(procedure.description)] }
+        public static func from(list: [ElementType]) -> Message.Register? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let options = list[safe: 2]?.dict,
@@ -375,19 +400,19 @@ extension Message {
         }
     }
 
-    internal struct Registered: ElementTypeConvertible, Equatable {
-        internal init(request: WampID, registration: WampID) {
+    public struct Registered: ElementTypeConvertible, Equatable {
+        public init(request: WampID, registration: WampID) {
             self.request = request
             self.registration = registration
         }
 
         // [REGISTERED, REGISTER.Request|id, Registration|id]
-        internal static let type: MessageType = 65
-        internal let request: WampID
-        internal let registration: WampID
+        public static let type: MessageType = 65
+        public let request: WampID
+        public let registration: WampID
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(registration.value)] }
-        internal static func from(list: [ElementType]) -> Message.Registered? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(registration.value)] }
+        public static func from(list: [ElementType]) -> Message.Registered? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let registration = list[safe: 2]?.integer.map(WampID.init(rawValue:))
@@ -396,19 +421,19 @@ extension Message {
         }
     }
 
-    internal struct Unregister: ElementTypeConvertible, Equatable {
-        internal init(request: WampID, registration: WampID) {
+    public struct Unregister: ElementTypeConvertible, Equatable {
+        public init(request: WampID, registration: WampID) {
             self.request = request
             self.registration = registration
         }
 
         // [UNREGISTER, Request|id, REGISTERED.Registration|id]
-        internal static let type: MessageType = 66
-        internal let request: WampID
-        internal let registration: WampID
+        public static let type: MessageType = 66
+        public let request: WampID
+        public let registration: WampID
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(registration.value)] }
-        internal static func from(list: [ElementType]) -> Message.Unregister? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(registration.value)] }
+        public static func from(list: [ElementType]) -> Message.Unregister? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let registration = list[safe: 2]?.integer.map(WampID.init(rawValue:))
@@ -417,17 +442,17 @@ extension Message {
         }
     }
 
-    internal struct Unregistered: ElementTypeConvertible, Equatable {
-        internal init(request: WampID) {
+    public struct Unregistered: ElementTypeConvertible, Equatable {
+        public init(request: WampID) {
             self.request = request
         }
 
         // [UNREGISTERED, UNREGISTER.Request|id]
-        internal static let type: MessageType = 67
-        internal let request: WampID
+        public static let type: MessageType = 67
+        public let request: WampID
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value)] }
-        internal static func from(list: [ElementType]) -> Message.Unregistered? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value)] }
+        public static func from(list: [ElementType]) -> Message.Unregistered? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:))
             else { return nil }
@@ -435,8 +460,8 @@ extension Message {
         }
     }
 
-    internal struct Invocation: ElementTypeConvertible, Equatable {
-        internal init(request: WampID, registration: WampID, details: [String : ElementType], arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+    public struct Invocation: ElementTypeConvertible, Equatable {
+        public init(request: WampID, registration: WampID, details: [String : ElementType], arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
             self.request = request
             self.registration = registration
             self.details = details
@@ -447,15 +472,15 @@ extension Message {
         // [INVOCATION, Request|id, REGISTERED.Registration|id, Details|dict]
         // [INVOCATION, Request|id, REGISTERED.Registration|id, Details|dict, C* Arguments|list]
         // [INVOCATION, Request|id, REGISTERED.Registration|id, Details|dict, CALL.Arguments|list, CALL.ArgumentsKw|dict]
-        internal static let type: MessageType = 68
-        internal let request: WampID
-        internal let registration: WampID
-        internal let details: [String: ElementType]
-        internal let arguments: [ElementType]?
-        internal let argumentsKw: [String: ElementType]?
+        public static let type: MessageType = 68
+        public let request: WampID
+        public let registration: WampID
+        public let details: [String: ElementType]
+        public let arguments: [ElementType]?
+        public let argumentsKw: [String: ElementType]?
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(registration.value), .dict(details), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
-        internal static func from(list: [ElementType]) -> Message.Invocation? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(registration.value), .dict(details), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public static func from(list: [ElementType]) -> Message.Invocation? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let registration = list[safe: 2]?.integer.map(WampID.init(rawValue:)),
@@ -467,8 +492,8 @@ extension Message {
         }
     }
 
-    internal struct Yield: ElementTypeConvertible, Equatable {
-        internal init(request: WampID, options: [String : ElementType], arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+    public struct Yield: ElementTypeConvertible, Equatable {
+        public init(request: WampID, options: [String : ElementType], arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
             self.request = request
             self.options = options
             self.arguments = arguments
@@ -478,14 +503,14 @@ extension Message {
         // [YIELD, INVOCATION.Request|id, Options|dict]
         // [YIELD, INVOCATION.Request|id, Options|dict, Arguments|list]
         // [YIELD, INVOCATION.Request|id, Options|dict, Arguments|list, ArgumentsKw|dict]
-        internal static let type: MessageType = 70
-        internal let request: WampID
-        internal let options: [String: ElementType]
-        internal let arguments: [ElementType]?
-        internal let argumentsKw: [String: ElementType]?
+        public static let type: MessageType = 70
+        public let request: WampID
+        public let options: [String: ElementType]
+        public let arguments: [ElementType]?
+        public let argumentsKw: [String: ElementType]?
 
-        internal var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
-        internal static func from(list: [ElementType]) -> Message.Yield? {
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public static func from(list: [ElementType]) -> Message.Yield? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let options = list[safe: 2]?.dict

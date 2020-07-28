@@ -60,8 +60,10 @@ public struct URI: Equatable, RawRepresentable, CustomStringConvertible, Lossles
 }
 
 extension URI {
-    enum WebSocketSubprotocol {
-        static var json = URI(unverified: "wamp.2.json")
-        static var msgpack = URI(unverified: "wamp.2.msgpack")
+    public struct SerializationFormat {
+        public let uri: URI
+
+        static var json = SerializationFormat(uri: URI(unverified: "wamp.2.json"))
+        static var msgpack = SerializationFormat(uri: URI(unverified: "wamp.2.msgpack"))
     }
 }

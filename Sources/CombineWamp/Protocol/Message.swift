@@ -31,9 +31,9 @@ From: https://wamp-proto.org/_static/gen/wamp_latest.html#protocol-overview
  | 70  | `YIELD`        |      |      |      |       | Rx    | Tx    |
  */
 
-internal typealias MessageType = Int
+public typealias MessageType = Int
 
-internal enum Message: Equatable {
+public enum Message: Equatable {
     case hello(Hello)
     case welcome(Welcome)
     case abort(Abort)
@@ -57,7 +57,7 @@ internal enum Message: Equatable {
 }
 
 extension Message: Decodable {
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         var arrayContainer = try decoder.unkeyedContainer()
         let type = try arrayContainer.decode(Int.self)
         switch type {
@@ -108,7 +108,7 @@ extension Message: Decodable {
 }
 
 extension Message: Encodable {
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         switch self {
         case let .hello(hello):
             try hello.encode(to: encoder)
