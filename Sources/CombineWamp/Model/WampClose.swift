@@ -31,12 +31,18 @@ public struct WampClose: CaseIterable, Equatable {
     /// Not clear if this is a bug on Crossbar. but this will be not publicly available for use, only as a ACK fallback.
     static let normal = WampClose(uri: "wamp.close.normal", isAck: true)
 
+    /// Please don't use it. It's not documented.
+    ///
+    /// However, WAMPCC examples send this message as acknowledgement, instead of expected "wamp.close.goodbye_and_out".
+    /// Not clear if this is a bug on WAMPCC. but this will be not publicly available for use, only as a ACK fallback.
+    static let errorGoodbyeAndOut = WampClose(uri: "wamp.error.goodbye_and_out", isAck: true)
+
     public static let systemShutdown = WampClose(uri: "wamp.close.system_shutdown", isAck: false)
     public static let closeRealm = WampClose(uri: "wamp.close.close_realm", isAck: false)
     public static let goodbyeAndOut = WampClose(uri: "wamp.close.goodbye_and_out", isAck: true)
     public static let protocolViolation = WampClose(error: WampError.protocolViolation)
 
     public static var allCases: [WampClose] {
-        [.normal, .systemShutdown, .closeRealm, .goodbyeAndOut, .protocolViolation]
+        [.normal, .errorGoodbyeAndOut, .systemShutdown, .closeRealm, .goodbyeAndOut, .protocolViolation]
     }
 }
