@@ -5,35 +5,37 @@ import FoundationExtensions
 
 /// A Session is a transient conversation between two Peers attached to a Realm and running over a Transport.
 /// https://wamp-proto.org/_static/gen/wamp_latest.html#realms-sessions-and-transports
-public class WampSession {
+public class WampSession: Cancellable {
     public let realm: URI
-    public let transport: WampTransport
-    public let serialization: WampSerializing
-    public let me: WampClient
-    private let messageBus = PassthroughSubject<Message, Never>()
+    private let transport: WampTransport
+    private let serialization: WampSerializing
+    let messageBus = PassthroughSubject<Message, Never>()
+    private var cancellables = Set<AnyCancellable>()
+    let idGenerator = WampID.createGlobalScopeIDs()
+    private let roles: Set<WampRole>
+
+    public var client: WampClient {
+        WampClient(session: self, roles: roles)
+    }
 
     /// A Session is a transient conversation between two Peers attached to a Realm and running over a Transport.
-    public init(transport: WampTransport, serialization: WampSerializing, realm: URI, me: WampClient) {
+    public init(transport: WampTransport, serialization: WampSerializing, realm: URI, roles: Set<WampRole>) {
         self.transport = transport
         self.serialization = serialization
         self.realm = realm
-        self.me = me
+        self.roles = roles
     }
 
     public func connect() -> AnyPublisher<Message.Welcome, ModuleError> {
-        let client = self.me
-        let serializer = self.serialization
-        let messageBus = self.messageBus
-
         return transport
             .autoconnect()
             .handleEvents(
-                receiveOutput: { event in
+                receiveOutput: { [weak self] event in
                     switch event {
                     case let .incomingMessage(message):
-                        self.gotPossibleMessage(serializer.deserialize(message))
+                        self?.gotPossibleMessage(message)
                     case .connected:
-                        self.didConnect()
+                        self?.didConnect()
                     }
                 },
                 receiveCompletion: { [weak self] completion in
@@ -46,29 +48,14 @@ public class WampSession {
                 }
             )
             .mapError { _ in .wampError(WampError.networkFailure) }
-            .flatMap { event -> AnyPublisher<Void, ModuleError> in
+            .flatMap { [weak self] event -> AnyPublisher<Message.Welcome, ModuleError> in
+                guard let self = self else { return Fail(error: ModuleError.sessionIsNotValid).eraseToAnyPublisher() }
                 switch event {
                 case .connected:
-                    return client.sayHello(session: self).eraseToAnyPublisher()
+                    return self.client.sayHello().eraseToAnyPublisher()
                 case .incomingMessage:
                     return Empty().eraseToAnyPublisher()
                 }
-            }
-            .flatMap { _ -> AnyPublisher<Message.Welcome, ModuleError> in
-                messageBus
-                    .first()
-                    .mapError(absurd)
-                    .flatMapResult { message in
-                        switch message {
-                        case let .welcome(welcome):
-                            return .init(value: welcome)
-                        case let .abort(abort):
-                            return .init(error: ModuleError.abort(abort))
-                        default:
-                            return .init(error: ModuleError.wampError(.protocolViolation))
-                        }
-                    }
-                    .eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }
@@ -87,18 +74,32 @@ public class WampSession {
             }
             .promise
     }
+
+    public func cancel() {
+        cancellables = []
+    }
 }
 
 extension WampSession {
     private func didConnect() {
     }
 
-    private func gotPossibleMessage(_ possibleMessage: Result<Message, Error>) {
-        switch possibleMessage {
+    private func gotPossibleMessage(_ possibleMessage: String) {
+        switch serialization.deserialize(possibleMessage) {
         case let .success(message):
             messageBus.send(message)
+            replyIfNeeded(message)
         case let .failure(error):
             cantParseMessage(error: error)
+        }
+    }
+
+    private func replyIfNeeded(_ message: Message) {
+        switch message {
+        case let .goodbye(goodbye) where !goodbye.reason.isAck:
+            replyGoodbye()
+        default:
+            break
         }
     }
 
@@ -109,5 +110,24 @@ extension WampSession {
     }
 
     private func cantParseMessage(error: Error) {
+    }
+}
+
+extension WampSession {
+    private func replyGoodbye() {
+        client
+            .replyGoodbye()
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case let .failure(error):
+                        print("Error on replying GOODBY with ACK. \(error)")
+                    case .finished:
+                        print("Bye!")
+                    }
+                },
+                receiveValue: { _ in }
+            )
+            .store(in: &cancellables)
     }
 }
