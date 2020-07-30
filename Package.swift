@@ -10,11 +10,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/teufelaudio/CombineWebSocket", .branch("master")),
-        .package(url: "https://github.com/CombineCommunity/CombineExt", from: "1.2.0"),
         .package(url: "https://github.com/teufelaudio/FoundationExtensions", .branch("master"))
     ],
     targets: [
-        .target(name: "CombineWamp", dependencies: ["CombineWebSocket", "CombineExt", "FoundationExtensions"]),
+        .target(name: "CombineWamp", dependencies: ["CombineWebSocket", "FoundationExtensions"]),
         .testTarget(name: "CombineWampTests", dependencies: ["CombineWamp"])
     ]
 )

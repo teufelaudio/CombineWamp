@@ -46,7 +46,7 @@ final class CalleeTests: IntegrationTestBase {
             .register(procedure: URI("com.teufel.tests.sum_from_the_app")!, onUnregister: { unregistering in
                 unregistering
                     .run(
-                        onSuccess: { unsubscribed in
+                        onSuccess: { unregistered in
                             unregistrationExpectation.fulfill()
                         },
                         onFailure: { error in
