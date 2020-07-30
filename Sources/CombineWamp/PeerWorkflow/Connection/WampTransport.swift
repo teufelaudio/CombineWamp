@@ -55,7 +55,6 @@ extension WampTransport {
         return WampTransport(
             connect: {
                 webSocket.publisher.map { message -> String in
-                    Swift.print("GOT MESSAGE \(message)")
                     switch message {
                     case let .string(text):
                         return text
