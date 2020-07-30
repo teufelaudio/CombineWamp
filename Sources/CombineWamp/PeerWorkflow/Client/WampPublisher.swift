@@ -10,13 +10,13 @@ public struct WampPublisher {
         self.session = session
     }
 
-    public func publish(topic: URI, positionalArguments: [ElementType]? = nil, arguments: [String : ElementType]? = nil)
+    public func publish(topic: URI, positionalArguments: [ElementType]? = nil, namedArguments: [String : ElementType]? = nil)
     -> Publishers.Promise<Message.Published, ModuleError> {
         guard let id = session.idGenerator.next() else { return .init(error: .sessionIsNotValid) }
         let messageBus = session.messageBus
 
         return session.send(
-            Message.publish(.init(request: id, options: .acknowledge, topic: topic, arguments: positionalArguments, argumentsKw: arguments))
+            Message.publish(.init(request: id, options: .acknowledge, topic: topic, positionalArguments: positionalArguments, namedArguments: namedArguments))
         )
         .flatMap { () -> Publishers.Promise<Message.Published, ModuleError> in
             messageBus
@@ -38,11 +38,11 @@ public struct WampPublisher {
         .promise
     }
 
-    public func publishWithoutAck(topic: URI, positionalArguments: [ElementType]? = nil, arguments: [String : ElementType]? = nil)
+    public func publishWithoutAck(topic: URI, positionalArguments: [ElementType]? = nil, namedArguments: [String : ElementType]? = nil)
     -> Publishers.Promise<Void, ModuleError> {
         guard let id = session.idGenerator.next() else { return .init(error: .sessionIsNotValid) }
         return session.send(
-            Message.publish(.init(request: id, options: [:], topic: topic, arguments: positionalArguments, argumentsKw: arguments))
+            Message.publish(.init(request: id, options: [:], topic: topic, positionalArguments: positionalArguments, namedArguments: namedArguments))
         )
     }
 }

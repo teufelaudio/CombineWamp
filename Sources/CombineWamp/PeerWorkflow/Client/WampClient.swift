@@ -24,8 +24,8 @@ public struct WampClient {
         roles.contains(.subscriber) ? WampSubscriber(session: session) : nil
     }
 
-    public var asCaller: Void? {
-        roles.contains(.caller) ? { fatalError("Not implemented") }() : nil
+    public var asCaller: WampCaller? {
+        roles.contains(.caller) ? WampCaller(session: session) : nil
     }
 
     public var asCallee: Void? {
