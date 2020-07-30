@@ -28,8 +28,8 @@ public struct WampClient {
         roles.contains(.caller) ? WampCaller(session: session) : nil
     }
 
-    public var asCallee: Void? {
-        roles.contains(.callee) ? { fatalError("Not implemented") }() : nil
+    public var asCallee: WampCallee? {
+        roles.contains(.callee) ? WampCallee(session: session) : nil
     }
 
     /// Client says HELLO, Router says WELCOME:
