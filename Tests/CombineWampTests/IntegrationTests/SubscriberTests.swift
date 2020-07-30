@@ -6,6 +6,7 @@ import XCTest
 // https://wamp-proto.org/_static/gen/wamp_latest.html#subscribing-and-unsubscribing
 // Apart from the Router, in order to run this test you also must run the publishing Docker
 // https://crossbar.io/docs/Getting-Started/#publishing-client
+// `docker run -v $PWD:/app -e CBURL="ws://crossbar:8080/ws" -e CBREALM="realm1" --link=crossbar --rm -it crossbario/autobahn-python:cpy3 python /app/1.hello-world/client_component_publish.py`
 // All of this will eventually be automated.
 final class SubscriberTests: IntegrationTestBase {
     var connected: XCTestExpectation!
@@ -63,9 +64,9 @@ final class SubscriberTests: IntegrationTestBase {
         wait(for: [receiveEventsExpectation], timeout: 5.0)
         XCTAssertEqual(receivedEvents.count, 3)
         for i in 0..<3 {
-            XCTAssertNil(receivedEvents[i].argumentsKw)
-            XCTAssertEqual(receivedEvents[i].arguments?.count, 1)
-            XCTAssertTrue(receivedEvents[i].arguments?.first?.string?.hasPrefix("Hello World ") == true)
+            XCTAssertNil(receivedEvents[safe: i]?.namedArguments)
+            XCTAssertEqual(receivedEvents[safe: i]?.positionalArguments?.count, 1)
+            XCTAssertTrue(receivedEvents[safe: i]?.positionalArguments?.first?.string?.hasPrefix("Hello World ") == true)
         }
         XCTAssertNotNil(connection)
     }

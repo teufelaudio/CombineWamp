@@ -730,8 +730,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 713845233),
                 details: [:],
                 error: WampError.notAuthorized.uri,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -756,8 +756,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 713845233),
                 details: [:],
                 error: WampError.notAuthorized.uri,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -781,8 +781,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 85346237),
                 details: [:],
                 error: WampError.noSuchSubscription.uri,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -807,8 +807,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 85346237),
                 details: [:],
                 error: WampError.noSuchSubscription.uri,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -832,8 +832,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 239714735),
                 details: [:],
                 error: WampError.notAuthorized.uri,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -858,8 +858,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 239714735),
                 details: [:],
                 error: WampError.notAuthorized.uri,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -883,8 +883,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 25349185),
                 details: [:],
                 error: WampError.procedureAlreadyExists.uri,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -909,8 +909,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 25349185),
                 details: [:],
                 error: WampError.procedureAlreadyExists.uri,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -934,8 +934,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 788923562),
                 details: [:],
                 error: WampError.noSuchRegistration.uri,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -960,8 +960,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 788923562),
                 details: [:],
                 error: WampError.noSuchRegistration.uri,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -985,8 +985,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 6131533),
                 details: [:],
                 error: WampError.applicationError(uri: URI("com.myapp.error.object_write_protected")!).uri,
-                arguments: [.string("Object is write protected.")],
-                argumentsKw: ["severity": .integer(3)]
+                positionalArguments: [.string("Object is write protected.")],
+                namedArguments: ["severity": .integer(3)]
             )
         )
 
@@ -1011,8 +1011,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 6131533),
                 details: [:],
                 error: WampError.applicationError(uri: URI("com.myapp.error.object_write_protected")!).uri,
-                arguments: [.string("Object is write protected.")],
-                argumentsKw: ["severity": .integer(3)]
+                positionalArguments: [.string("Object is write protected.")],
+                namedArguments: ["severity": .integer(3)]
             )
         )
 
@@ -1036,8 +1036,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 7814135),
                 details: [:],
                 error: WampError.applicationError(uri: URI("com.myapp.error.object_write_protected")!).uri,
-                arguments: [.string("Object is write protected.")],
-                argumentsKw: ["severity": .integer(3)]
+                positionalArguments: [.string("Object is write protected.")],
+                namedArguments: ["severity": .integer(3)]
             )
         )
 
@@ -1062,8 +1062,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 7814135),
                 details: [:],
                 error: WampError.applicationError(uri: URI("com.myapp.error.object_write_protected")!).uri,
-                arguments: [.string("Object is write protected.")],
-                argumentsKw: ["severity": .integer(3)]
+                positionalArguments: [.string("Object is write protected.")],
+                namedArguments: ["severity": .integer(3)]
             )
         )
 
@@ -1087,8 +1087,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 7814135),
                 details: [:],
                 error: WampError.noSuchProcedure.uri,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -1113,8 +1113,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 7814135),
                 details: [:],
                 error: WampError.noSuchProcedure.uri,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -1233,8 +1233,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 239714735),
                 options: [:],
                 topic: URI("com.myapp.mytopic1")!,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -1258,8 +1258,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 239714735),
                 options: [:],
                 topic: URI("com.myapp.mytopic1")!,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -1282,8 +1282,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 239714735),
                 options: [:],
                 topic: URI("com.myapp.mytopic1")!,
-                arguments: [.string("Hello, world!")],
-                argumentsKw: nil
+                positionalArguments: [.string("Hello, world!")],
+                namedArguments: nil
             )
         )
 
@@ -1307,8 +1307,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 239714735),
                 options: [:],
                 topic: URI("com.myapp.mytopic1")!,
-                arguments: [.string("Hello, world!")],
-                argumentsKw: nil
+                positionalArguments: [.string("Hello, world!")],
+                namedArguments: nil
             )
         )
 
@@ -1331,8 +1331,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 239714735),
                 options: [:],
                 topic: URI("com.myapp.mytopic1")!,
-                arguments: [],
-                argumentsKw: [
+                positionalArguments: [],
+                namedArguments: [
                     "color": .string("orange"),
                     "sizes": .list([.integer(23),.integer(42),.integer(7)])
                 ]
@@ -1359,8 +1359,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 239714735),
                 options: [:],
                 topic: URI("com.myapp.mytopic1")!,
-                arguments: [],
-                argumentsKw: [
+                positionalArguments: nil,
+                namedArguments: [
                     "color": .string("orange"),
                     "sizes": .list([.integer(23),.integer(42),.integer(7)])
                 ]
@@ -1437,8 +1437,8 @@ extension MessageJSONTests {
                 subscription: .init(integerLiteral: 5512315355),
                 publication: .init(integerLiteral: 4429313566),
                 details: [:],
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -1462,8 +1462,8 @@ extension MessageJSONTests {
                 subscription: .init(integerLiteral: 5512315355),
                 publication: .init(integerLiteral: 4429313566),
                 details: [:],
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -1486,8 +1486,8 @@ extension MessageJSONTests {
                 subscription: .init(integerLiteral: 5512315355),
                 publication: .init(integerLiteral: 4429313566),
                 details: [:],
-                arguments: [.string("Hello, world!")],
-                argumentsKw: nil
+                positionalArguments: [.string("Hello, world!")],
+                namedArguments: nil
             )
         )
 
@@ -1511,8 +1511,8 @@ extension MessageJSONTests {
                 subscription: .init(integerLiteral: 5512315355),
                 publication: .init(integerLiteral: 4429313566),
                 details: [:],
-                arguments: [.string("Hello, world!")],
-                argumentsKw: nil
+                positionalArguments: [.string("Hello, world!")],
+                namedArguments: nil
             )
         )
 
@@ -1535,8 +1535,8 @@ extension MessageJSONTests {
                 subscription: .init(integerLiteral: 5512315355),
                 publication: .init(integerLiteral: 4429313566),
                 details: [:],
-                arguments: [],
-                argumentsKw: [
+                positionalArguments: [],
+                namedArguments: [
                     "color": .string("orange"),
                     "sizes": .list([.integer(23),.integer(42),.integer(7)])
                 ]
@@ -1563,8 +1563,8 @@ extension MessageJSONTests {
                 subscription: .init(integerLiteral: 5512315355),
                 publication: .init(integerLiteral: 4429313566),
                 details: [:],
-                arguments: [],
-                argumentsKw: [
+                positionalArguments: nil,
+                namedArguments: [
                     "color": .string("orange"),
                     "sizes": .list([.integer(23),.integer(42),.integer(7)])
                 ]
@@ -1779,8 +1779,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 7814135),
                 options: [:],
                 procedure: URI("com.myapp.ping")!,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -1804,8 +1804,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 7814135),
                 options: [:],
                 procedure: URI("com.myapp.ping")!,
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -1828,8 +1828,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 7814135),
                 options: [:],
                 procedure: URI("com.myapp.echo")!,
-                arguments: [.string("Hello, world!")],
-                argumentsKw: nil
+                positionalArguments: [.string("Hello, world!")],
+                namedArguments: nil
             )
         )
 
@@ -1853,8 +1853,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 7814135),
                 options: [:],
                 procedure: URI("com.myapp.echo")!,
-                arguments: [.string("Hello, world!")],
-                argumentsKw: nil
+                positionalArguments: [.string("Hello, world!")],
+                namedArguments: nil
             )
         )
 
@@ -1877,8 +1877,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 7814135),
                 options: [:],
                 procedure: URI("com.myapp.add2")!,
-                arguments: [.integer(23), .integer(7)],
-                argumentsKw: nil
+                positionalArguments: [.integer(23), .integer(7)],
+                namedArguments: nil
             )
         )
 
@@ -1902,8 +1902,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 7814135),
                 options: [:],
                 procedure: URI("com.myapp.add2")!,
-                arguments: [.integer(23), .integer(7)],
-                argumentsKw: nil
+                positionalArguments: [.integer(23), .integer(7)],
+                namedArguments: nil
             )
         )
 
@@ -1926,8 +1926,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 7814135),
                 options: [:],
                 procedure: URI("com.myapp.user.new")!,
-                arguments: [.string("johnny")],
-                argumentsKw: [
+                positionalArguments: [.string("johnny")],
+                namedArguments: [
                     "firstname": .string("John"),
                     "surname": .string("Doe")
                 ]
@@ -1954,8 +1954,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 7814135),
                 options: [:],
                 procedure: URI("com.myapp.user.new")!,
-                arguments: [.string("johnny")],
-                argumentsKw: [
+                positionalArguments: [.string("johnny")],
+                namedArguments: [
                     "firstname": .string("John"),
                     "surname": .string("Doe")
                 ]
@@ -1986,8 +1986,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 6131533),
                 registration: .init(integerLiteral: 9823526),
                 details: [:],
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -2011,8 +2011,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 6131533),
                 registration: .init(integerLiteral: 9823526),
                 details: [:],
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -2035,8 +2035,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 6131533),
                 registration: .init(integerLiteral: 9823527),
                 details: [:],
-                arguments: [.string("Hello, world!")],
-                argumentsKw: nil
+                positionalArguments: [.string("Hello, world!")],
+                namedArguments: nil
             )
         )
 
@@ -2060,8 +2060,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 6131533),
                 registration: .init(integerLiteral: 9823527),
                 details: [:],
-                arguments: [.string("Hello, world!")],
-                argumentsKw: nil
+                positionalArguments: [.string("Hello, world!")],
+                namedArguments: nil
             )
         )
 
@@ -2084,8 +2084,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 6131533),
                 registration: .init(integerLiteral: 9823528),
                 details: [:],
-                arguments: [.integer(23), .integer(7)],
-                argumentsKw: nil
+                positionalArguments: [.integer(23), .integer(7)],
+                namedArguments: nil
             )
         )
 
@@ -2109,8 +2109,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 6131533),
                 registration: .init(integerLiteral: 9823528),
                 details: [:],
-                arguments: [.integer(23), .integer(7)],
-                argumentsKw: nil
+                positionalArguments: [.integer(23), .integer(7)],
+                namedArguments: nil
             )
         )
 
@@ -2133,8 +2133,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 6131533),
                 registration: .init(integerLiteral: 9823529),
                 details: [:],
-                arguments: [.string("johnny")],
-                argumentsKw: [
+                positionalArguments: [.string("johnny")],
+                namedArguments: [
                     "firstname": .string("John"),
                     "surname": .string("Doe")
                 ]
@@ -2161,8 +2161,8 @@ extension MessageJSONTests {
                 request: .init(integerLiteral: 6131533),
                 registration: .init(integerLiteral: 9823529),
                 details: [:],
-                arguments: [.string("johnny")],
-                argumentsKw: [
+                positionalArguments: [.string("johnny")],
+                namedArguments: [
                     "firstname": .string("John"),
                     "surname": .string("Doe")
                 ]
@@ -2192,8 +2192,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 6131533),
                 options: [:],
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -2216,8 +2216,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 6131533),
                 options: [:],
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -2239,8 +2239,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 6131533),
                 options: [:],
-                arguments: [.string("Hello, world!")],
-                argumentsKw: nil
+                positionalArguments: [.string("Hello, world!")],
+                namedArguments: nil
             )
         )
 
@@ -2263,8 +2263,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 6131533),
                 options: [:],
-                arguments: [.string("Hello, world!")],
-                argumentsKw: nil
+                positionalArguments: [.string("Hello, world!")],
+                namedArguments: nil
             )
         )
 
@@ -2286,8 +2286,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 6131533),
                 options: [:],
-                arguments: [.integer(30)],
-                argumentsKw: nil
+                positionalArguments: [.integer(30)],
+                namedArguments: nil
             )
         )
 
@@ -2310,8 +2310,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 6131533),
                 options: [:],
-                arguments: [.integer(30)],
-                argumentsKw: nil
+                positionalArguments: [.integer(30)],
+                namedArguments: nil
             )
         )
 
@@ -2333,8 +2333,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 6131533),
                 options: [:],
-                arguments: [],
-                argumentsKw: [
+                positionalArguments: [],
+                namedArguments: [
                     "userid": .integer(123),
                     "karma": .integer(10)
                 ]
@@ -2360,8 +2360,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 6131533),
                 options: [:],
-                arguments: [],
-                argumentsKw: [
+                positionalArguments: nil,
+                namedArguments: [
                     "userid": .integer(123),
                     "karma": .integer(10)
                 ]
@@ -2392,8 +2392,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 7814135),
                 details: [:],
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -2416,8 +2416,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 7814135),
                 details: [:],
-                arguments: nil,
-                argumentsKw: nil
+                positionalArguments: nil,
+                namedArguments: nil
             )
         )
 
@@ -2439,8 +2439,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 7814135),
                 details: [:],
-                arguments: [.string("Hello, world!")],
-                argumentsKw: nil
+                positionalArguments: [.string("Hello, world!")],
+                namedArguments: nil
             )
         )
 
@@ -2463,8 +2463,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 7814135),
                 details: [:],
-                arguments: [.string("Hello, world!")],
-                argumentsKw: nil
+                positionalArguments: [.string("Hello, world!")],
+                namedArguments: nil
             )
         )
 
@@ -2486,8 +2486,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 7814135),
                 details: [:],
-                arguments: [.integer(30)],
-                argumentsKw: nil
+                positionalArguments: [.integer(30)],
+                namedArguments: nil
             )
         )
 
@@ -2510,8 +2510,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 7814135),
                 details: [:],
-                arguments: [.integer(30)],
-                argumentsKw: nil
+                positionalArguments: [.integer(30)],
+                namedArguments: nil
             )
         )
 
@@ -2533,8 +2533,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 7814135),
                 details: [:],
-                arguments: [],
-                argumentsKw: [
+                positionalArguments: [],
+                namedArguments: [
                     "userid": .integer(123),
                     "karma": .integer(10)
                 ]
@@ -2560,8 +2560,8 @@ extension MessageJSONTests {
             .init(
                 request: .init(integerLiteral: 7814135),
                 details: [:],
-                arguments: [],
-                argumentsKw: [
+                positionalArguments: nil,
+                namedArguments: [
                     "userid": .integer(123),
                     "karma": .integer(10)
                 ]
