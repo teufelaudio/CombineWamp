@@ -54,7 +54,33 @@ final class PublisherTests: IntegrationTestBase {
                 }
             ).store(in: &cancellables)
 
-        wait(for: [publishedReceived], timeout: 1.0)
+        wait(for: [publishedReceived], timeout: 0.5)
+        XCTAssertNotNil(connection)
+    }
+
+    func testPublishWithoutAck() throws {
+        wait(for: [connected], timeout: 0.5)
+
+        let publishedReceived = expectation(description: "Published should have been received")
+        session
+            .client
+            .asPublisher?
+            .publishWithoutAck(topic: URI("com.myapp.hello")!, positionalArguments: [.string("Hello World 42")])
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case let .failure(error):
+                        XCTFail(error.localizedDescription)
+                    case .finished:
+                        break
+                    }
+                },
+                receiveValue: { _ in
+                    publishedReceived.fulfill()
+                }
+            ).store(in: &cancellables)
+
+        wait(for: [publishedReceived], timeout: 0.5)
         XCTAssertNotNil(connection)
     }
 
@@ -82,7 +108,7 @@ final class PublisherTests: IntegrationTestBase {
                 }
             ).store(in: &cancellables)
 
-        wait(for: [errorReceived], timeout: 1.0)
+        wait(for: [errorReceived], timeout: 0.5)
         XCTAssertNotNil(connection)
     }
 }
