@@ -1,0 +1,34 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "CombineExt",
+        "repositoryURL": "https://github.com/CombineCommunity/CombineExt",
+        "state": {
+          "branch": null,
+          "revision": "6664678135c6aec049c887a51c9da2545f184882",
+          "version": "1.2.0"
+        }
+      },
+      {
+        "package": "CombineWebSocket",
+        "repositoryURL": "https://github.com/teufelaudio/CombineWebSocket",
+        "state": {
+          "branch": "master",
+          "revision": "a5326a5a577f6e44dcdbc0c100fa53f708a5178a",
+          "version": null
+        }
+      },
+      {
+        "package": "FoundationExtensions",
+        "repositoryURL": "https://github.com/teufelaudio/FoundationExtensions",
+        "state": {
+          "branch": "master",
+          "revision": "89c5f07a0208f838f1f24a5ae085f506da47f1ab",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
