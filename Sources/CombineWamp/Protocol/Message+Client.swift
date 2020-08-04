@@ -34,6 +34,12 @@ extension Message {
     }
 }
 
+extension Dictionary where Key == String, Value == ElementType {
+    public static var acknowledge: [String: ElementType] {
+        ["acknowledge": .bool(true)]
+    }
+}
+
 extension Message {
     internal enum Publisher: Equatable {
         internal enum Output: Equatable {

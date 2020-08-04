@@ -7,4 +7,5 @@ public enum ModuleError: Error {
     case unknownError(Error)
     case sessionIsNotValid
     case abort(Message.Abort)
+    case commandError(Message.WampError)
 }

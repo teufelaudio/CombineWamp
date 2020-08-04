@@ -3,39 +3,15 @@ import CombineWamp
 import Foundation
 import XCTest
 
-final class IntegrationTest: XCTestCase {
-    let serialization: WampSerializing = {
-        let decoder = JSONDecoder()
-        let encoder = JSONEncoder()
-        return WampSerializing.json(decoder: { decoder }, encoder: { encoder })
-    }()
-
-    func transport() -> WampTransport {
-        let router = URL(string: "ws://localhost:8080/ws")!
-        let urlSession = URLSession.init(configuration: .ephemeral)
-        return WampTransport.webSocket(wsURL: router, urlSession: urlSession, serializationFormat: serialization.serializationFormat)
-    }
-
-    func client() -> WampClient {
-        WampClient(
-            publish: { topic in
-                AnySubscriber<String, Error>()
-            },
-            subscribe: { topic in
-                PassthroughSubject<String, Error>().eraseToAnyPublisher()
-            },
-            call: nil,
-            respond: nil
-        )
-    }
-
+// https://wamp-proto.org/_static/gen/wamp_latest.html#session-establishment
+final class SessionEstablishmentTests: IntegrationTestBase {
     func testSayHelloReceiveWelcome() throws {
         let realm = URI("realm1")!
-        let session = WampSession(transport: transport(), serialization: serialization, realm: realm, me: client())
+        let session = WampSession(transport: transport(), serialization: serialization, realm: realm, roles: .allClientRoles)
 
         let welcomeReceived = expectation(description: "it should receive welcome")
 
-        let cancellable = session.connect()
+        session.connect()
             .sink(
                 receiveCompletion: { completion in
                     switch completion {
@@ -48,19 +24,18 @@ final class IntegrationTest: XCTestCase {
                 receiveValue: { welcome in
                     welcomeReceived.fulfill()
                 }
-            )
+            ).store(in: &cancellables)
 
-        wait(for: [welcomeReceived], timeout: 1.5)
-        cancellable.cancel()
+        wait(for: [welcomeReceived], timeout: 0.5)
     }
 
-    func testSayHelloReceiveAbord() throws {
+    func testSayHelloReceiveAbort() throws {
         let realm = URI("invalid_realm_dude")!
-        let session = WampSession(transport: transport(), serialization: serialization, realm: realm, me: client())
+        let session = WampSession(transport: transport(), serialization: serialization, realm: realm, roles: .allClientRoles)
 
         let abortReceived = expectation(description: "it should receive abort")
 
-        let cancellable = session.connect()
+        session.connect()
             .sink(
                 receiveCompletion: { completion in
                     switch completion {
@@ -79,9 +54,8 @@ final class IntegrationTest: XCTestCase {
                 receiveValue: { welcome in
                     XCTFail("Welcome was not expected in this test")
                 }
-            )
+            ).store(in: &cancellables)
 
-        wait(for: [abortReceived], timeout: 1.5)
-        cancellable.cancel()
+        wait(for: [abortReceived], timeout: 0.5)
     }
 }

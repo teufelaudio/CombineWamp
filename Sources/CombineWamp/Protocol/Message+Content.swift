@@ -1,13 +1,23 @@
 import Foundation
 import FoundationExtensions
 
-public enum WampRole: String {
+public enum WampRole: String, CaseIterable {
     case publisher
     case subscriber
     case caller
     case callee
     case broker
     case dealer
+}
+
+extension Collection where Element == WampRole {
+    public static var allClientRoles: Set<WampRole> {
+        [.publisher, .subscriber, .caller, .callee]
+    }
+
+    public static var allRouterRoles: Set<WampRole> {
+        [.dealer, .broker]
+    }
 }
 
 extension Dictionary where Key == String, Value == ElementType {
@@ -91,7 +101,7 @@ extension Message {
     }
 
     public struct Goodbye: ElementTypeConvertible, Equatable {
-        public init(details: [String : ElementType], reason: URI) {
+        public init(details: [String : ElementType], reason: WampClose) {
             self.details = details
             self.reason = reason
         }
@@ -99,14 +109,15 @@ extension Message {
         // [GOODBYE, Details|dict, Reason|uri]
         public static let type: MessageType = 6
         public let details: [String: ElementType]
-        public let reason: URI
+        public let reason: WampClose
 
-        public var asList: [ElementType] { [.integer(Self.type), .dict(details), .string(reason.description)] }
+        public var asList: [ElementType] { [.integer(Self.type), .dict(details), .string(reason.uri.description)] }
         public static func from(list: [ElementType]) -> Message.Goodbye? {
             guard list[safe: 0]?.integer == Self.type,
                   let details = list[safe: 1]?.dict,
-                  let reason = list[safe: 2]?.string.map({ URI.init(unverified: $0, isWildcard: false) })
+                  let reasonURI = list[safe: 2]?.string.map({ URI.init(unverified: $0, isWildcard: false) })
             else { return nil }
+            let reason = WampClose.allCases.first(where: { $0.uri == reasonURI }) ?? WampClose(uri: reasonURI, code: .normal, isAck: false)
             return .init(details: details, reason: reason)
         }
     }

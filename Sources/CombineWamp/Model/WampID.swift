@@ -34,7 +34,7 @@ extension WampID {
     /// PUBLISHED.Publication
     /// EVENT.Publication
     public static func createSessionScopeIDs() -> AutoIncrementID {
-        AutoIncrementID(range: 1...2^53, overflowStrategy: .resetToMin)
+        AutoIncrementID(range: 1...Int(pow(2.0, 53)), overflowStrategy: .resetToMin)
     }
 }
 
@@ -58,6 +58,6 @@ extension WampID {
     /// INTERRUPT.Request
     /// YIELD.Request
     public static func createGlobalScopeIDs() -> RandomNumericID {
-        RandomNumericID(range: 1...2^53, overflowStrategy: .resetList)
+        RandomNumericID(range: 1...Int(pow(2.0, 53)), overflowStrategy: .resetList)
     }
 }

@@ -454,7 +454,7 @@ extension MessageJSONTests {
                 details: [
                     "message": .string("The host is shutting down now.")
                 ],
-                reason: WampClose.systemShutdown.uri
+                reason: WampClose.systemShutdown
             )
         )
 
@@ -478,7 +478,7 @@ extension MessageJSONTests {
                 details: [
                     "message": .string("The host is shutting down now.")
                 ],
-                reason: WampClose.systemShutdown.uri
+                reason: WampClose.systemShutdown
             )
         )
 
@@ -499,7 +499,7 @@ extension MessageJSONTests {
         let model = Message.goodbye(
             .init(
                 details: [:],
-                reason: WampClose.goodbyeAndOut.uri
+                reason: WampClose.goodbyeAndOut
             )
         )
 
@@ -521,7 +521,7 @@ extension MessageJSONTests {
         let model = Message.goodbye(
             .init(
                 details: [:],
-                reason: WampClose.goodbyeAndOut.uri
+                reason: WampClose.goodbyeAndOut
             )
         )
 
@@ -542,7 +542,7 @@ extension MessageJSONTests {
         let model = Message.goodbye(
             .init(
                 details: [:],
-                reason: WampClose.closeRealm.uri
+                reason: WampClose.closeRealm
             )
         )
 
@@ -564,7 +564,7 @@ extension MessageJSONTests {
         let model = Message.goodbye(
             .init(
                 details: [:],
-                reason: WampClose.closeRealm.uri
+                reason: WampClose.closeRealm
             )
         )
 
@@ -585,7 +585,7 @@ extension MessageJSONTests {
         let model = Message.goodbye(
             .init(
                 details: [:],
-                reason: WampClose.goodbyeAndOut.uri
+                reason: WampClose.goodbyeAndOut
             )
         )
 
@@ -607,7 +607,7 @@ extension MessageJSONTests {
         let model = Message.goodbye(
             .init(
                 details: [:],
-                reason: WampClose.goodbyeAndOut.uri
+                reason: WampClose.goodbyeAndOut
             )
         )
 
