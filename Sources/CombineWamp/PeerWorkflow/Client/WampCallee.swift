@@ -18,18 +18,15 @@ public struct WampCallee {
         return session.send(
             Message.register(.init(request: id, options: [:], procedure: procedure))
         )
-        .print("*** ")
         .flatMap { () -> Publishers.Promise<Message.Registered, ModuleError> in
             messageBus
                 .setFailureType(to: ModuleError.self)
                 .flatMap { message -> AnyPublisher<Message.Registered, ModuleError> in
                     if case let .registered(registered) = message, registered.request == id {
-                        Swift.print("*** registered")
                         return Just<Message.Registered>(registered).setFailureType(to: ModuleError.self).eraseToAnyPublisher()
                     }
 
                     if case let .error(error) = message, error.requestType == Message.Register.type, error.request == id {
-                        Swift.print("*** error")
                         return Fail<Message.Registered, ModuleError>(error: .commandError(error)).eraseToAnyPublisher()
                     }
 

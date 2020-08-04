@@ -120,7 +120,7 @@ extension WampSession {
                 receiveCompletion: { completion in
                     switch completion {
                     case let .failure(error):
-                        print("Error on replying GOODBY with ACK. \(error)")
+                        print("Error on replying GOODBYE with ACK. \(error)")
                     case .finished:
                         print("Bye!")
                     }
