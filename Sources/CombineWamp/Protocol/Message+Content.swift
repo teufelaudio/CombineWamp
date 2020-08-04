@@ -123,13 +123,13 @@ extension Message {
     }
 
     public struct WampError: ElementTypeConvertible, Equatable {
-        public init(requestType: MessageType, request: WampID, details: [String : ElementType], error: URI, arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+        public init(requestType: MessageType, request: WampID, details: [String : ElementType], error: URI, positionalArguments: [ElementType]?, namedArguments: [String : ElementType]?) {
             self.requestType = requestType
             self.request = request
             self.details = details
             self.error = error
-            self.arguments = arguments
-            self.argumentsKw = argumentsKw
+            self.positionalArguments = positionalArguments
+            self.namedArguments = namedArguments
         }
 
         // [ERROR, REQUEST.Type|int, REQUEST.Request|id, Details|dict, Error|uri]
@@ -140,10 +140,13 @@ extension Message {
         public let request: WampID
         public let details: [String: ElementType]
         public let error: URI
-        public let arguments: [ElementType]?
-        public let argumentsKw: [String: ElementType]?
+        public let positionalArguments: [ElementType]?
+        public let namedArguments: [String: ElementType]?
 
-        public var asList: [ElementType] { [.integer(Self.type), .integer(requestType), .integer(request.value), .dict(details), .string(error.description), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public var asList: [ElementType] {
+            [.integer(Self.type), .integer(requestType), .integer(request.value), .dict(details), .string(error.description)]
+                + parseArguments(positional: positionalArguments, named: namedArguments)
+        }
         public static func from(list: [ElementType]) -> Message.WampError? {
             guard list[safe: 0]?.integer == Self.type,
                   let requestType = list[safe: 1]?.integer,
@@ -151,19 +154,19 @@ extension Message {
                   let details = list[safe: 3]?.dict,
                   let error = list[safe: 4]?.string.map({ URI.init(unverified: $0, isWildcard: false) })
             else { return nil }
-            let arguments = list[safe: 5]?.list ?? list[safe: 6]?.list
-            let argumentsKw = list[safe: 5]?.dict ?? list[safe: 6]?.dict
-            return .init(requestType: requestType, request: request, details: details, error: error, arguments: arguments, argumentsKw: argumentsKw)
+            let positionalArguments = list[safe: 5]?.list ?? list[safe: 6]?.list
+            let namedArguments = list[safe: 5]?.dict ?? list[safe: 6]?.dict
+            return .init(requestType: requestType, request: request, details: details, error: error, positionalArguments: positionalArguments, namedArguments: namedArguments)
         }
     }
 
     public struct Publish: ElementTypeConvertible, Equatable {
-        public init(request: WampID, options: [String : ElementType], topic: URI, arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+        public init(request: WampID, options: [String : ElementType], topic: URI, positionalArguments: [ElementType]?, namedArguments: [String : ElementType]?) {
             self.request = request
             self.options = options
             self.topic = topic
-            self.arguments = arguments
-            self.argumentsKw = argumentsKw
+            self.positionalArguments = positionalArguments
+            self.namedArguments = namedArguments
         }
 
         // [PUBLISH, Request|id, Options|dict, Topic|uri]
@@ -173,19 +176,22 @@ extension Message {
         public let request: WampID
         public let options: [String: ElementType]
         public let topic: URI
-        public let arguments: [ElementType]?
-        public let argumentsKw: [String: ElementType]?
+        public let positionalArguments: [ElementType]?
+        public let namedArguments: [String: ElementType]?
 
-        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), .string(topic.description), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public var asList: [ElementType] {
+            [.integer(Self.type), .integer(request.value), .dict(options), .string(topic.description)]
+                + parseArguments(positional: positionalArguments, named: namedArguments)
+        }
         public static func from(list: [ElementType]) -> Message.Publish? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let options = list[safe: 2]?.dict,
                   let topic = list[safe: 3]?.string.flatMap(URI.init(_:))
             else { return nil }
-            let arguments = list[safe: 4]?.list ?? list[safe: 5]?.list
-            let argumentsKw = list[safe: 4]?.dict ?? list[safe: 5]?.dict
-            return .init(request: request, options: options, topic: topic, arguments: arguments, argumentsKw: argumentsKw)
+            let positionalArguments = list[safe: 4]?.list ?? list[safe: 5]?.list
+            let namedArguments = list[safe: 4]?.dict ?? list[safe: 5]?.dict
+            return .init(request: request, options: options, topic: topic, positionalArguments: positionalArguments, namedArguments: namedArguments)
         }
     }
 
@@ -295,12 +301,12 @@ extension Message {
     }
 
     public struct Event: ElementTypeConvertible, Equatable {
-        public init(subscription: WampID, publication: WampID, details: [String : ElementType], arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+        public init(subscription: WampID, publication: WampID, details: [String : ElementType], positionalArguments: [ElementType]?, namedArguments: [String : ElementType]?) {
             self.subscription = subscription
             self.publication = publication
             self.details = details
-            self.arguments = arguments
-            self.argumentsKw = argumentsKw
+            self.positionalArguments = positionalArguments
+            self.namedArguments = namedArguments
         }
 
         // [EVENT, SUBSCRIBED.Subscription|id, PUBLISHED.Publication|id, Details|dict]
@@ -310,29 +316,32 @@ extension Message {
         public let subscription: WampID
         public let publication: WampID
         public let details: [String: ElementType]
-        public let arguments: [ElementType]?
-        public let argumentsKw: [String: ElementType]?
+        public let positionalArguments: [ElementType]?
+        public let namedArguments: [String: ElementType]?
 
-        public var asList: [ElementType] { [.integer(Self.type), .integer(subscription.value), .integer(publication.value), .dict(details), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public var asList: [ElementType] {
+            [.integer(Self.type), .integer(subscription.value), .integer(publication.value), .dict(details)]
+                + parseArguments(positional: positionalArguments, named: namedArguments)
+        }
         public static func from(list: [ElementType]) -> Message.Event? {
             guard list[safe: 0]?.integer == Self.type,
                   let subscription = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let publication = list[safe: 2]?.integer.map(WampID.init(rawValue:)),
                   let details = list[safe: 3]?.dict
             else { return nil }
-            let arguments = list[safe: 4]?.list ?? list[safe: 5]?.list
-            let argumentsKw = list[safe: 4]?.dict ?? list[safe: 5]?.dict
-            return .init(subscription: subscription, publication: publication, details: details, arguments: arguments, argumentsKw: argumentsKw)
+            let positionalArguments = list[safe: 4]?.list ?? list[safe: 5]?.list
+            let namedArguments = list[safe: 4]?.dict ?? list[safe: 5]?.dict
+            return .init(subscription: subscription, publication: publication, details: details, positionalArguments: positionalArguments, namedArguments: namedArguments)
         }
     }
 
     public struct Call: ElementTypeConvertible, Equatable {
-        public init(request: WampID, options: [String : ElementType], procedure: URI, arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+        public init(request: WampID, options: [String : ElementType], procedure: URI, positionalArguments: [ElementType]?, namedArguments: [String : ElementType]?) {
             self.request = request
             self.options = options
             self.procedure = procedure
-            self.arguments = arguments
-            self.argumentsKw = argumentsKw
+            self.positionalArguments = positionalArguments
+            self.namedArguments = namedArguments
         }
 
         // [CALL, Request|id, Options|dict, Procedure|uri]
@@ -342,28 +351,30 @@ extension Message {
         public let request: WampID
         public let options: [String: ElementType]
         public let procedure: URI
-        public let arguments: [ElementType]?
-        public let argumentsKw: [String: ElementType]?
+        public let positionalArguments: [ElementType]?
+        public let namedArguments: [String: ElementType]?
 
-        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), .string(procedure.description), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), .string(procedure.description)]
+            + parseArguments(positional: positionalArguments, named: namedArguments)
+        }
         public static func from(list: [ElementType]) -> Message.Call? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let options = list[safe: 2]?.dict,
                   let procedure = list[safe: 3]?.string.flatMap(URI.init(_:))
             else { return nil }
-            let arguments = list[safe: 4]?.list ?? list[safe: 5]?.list
-            let argumentsKw = list[safe: 4]?.dict ?? list[safe: 5]?.dict
-            return .init(request: request, options: options, procedure: procedure, arguments: arguments, argumentsKw: argumentsKw)
+            let positionalArguments = list[safe: 4]?.list ?? list[safe: 5]?.list
+            let namedArguments = list[safe: 4]?.dict ?? list[safe: 5]?.dict
+            return .init(request: request, options: options, procedure: procedure, positionalArguments: positionalArguments, namedArguments: namedArguments)
         }
     }
 
     public struct Result: ElementTypeConvertible, Equatable {
-        public init(request: WampID, details: [String : ElementType], arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+        public init(request: WampID, details: [String : ElementType], positionalArguments: [ElementType]?, namedArguments: [String : ElementType]?) {
             self.request = request
             self.details = details
-            self.arguments = arguments
-            self.argumentsKw = argumentsKw
+            self.positionalArguments = positionalArguments
+            self.namedArguments = namedArguments
         }
 
         // [RESULT, CALL.Request|id, Details|dict]
@@ -372,18 +383,20 @@ extension Message {
         public static let type: MessageType = 50
         public let request: WampID
         public let details: [String: ElementType]
-        public let arguments: [ElementType]?
-        public let argumentsKw: [String: ElementType]?
+        public let positionalArguments: [ElementType]?
+        public let namedArguments: [String: ElementType]?
 
-        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(details), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(details)]
+            + parseArguments(positional: positionalArguments, named: namedArguments)
+        }
         public static func from(list: [ElementType]) -> Message.Result? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let details = list[safe: 2]?.dict
             else { return nil }
-            let arguments = list[safe: 3]?.list ?? list[safe: 4]?.list
-            let argumentsKw = list[safe: 3]?.dict ?? list[safe: 4]?.dict
-            return .init(request: request, details: details, arguments: arguments, argumentsKw: argumentsKw)
+            let positionalArguments = list[safe: 3]?.list ?? list[safe: 4]?.list
+            let namedArguments = list[safe: 3]?.dict ?? list[safe: 4]?.dict
+            return .init(request: request, details: details, positionalArguments: positionalArguments, namedArguments: namedArguments)
         }
     }
 
@@ -472,12 +485,12 @@ extension Message {
     }
 
     public struct Invocation: ElementTypeConvertible, Equatable {
-        public init(request: WampID, registration: WampID, details: [String : ElementType], arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+        public init(request: WampID, registration: WampID, details: [String : ElementType], positionalArguments: [ElementType]?, namedArguments: [String : ElementType]?) {
             self.request = request
             self.registration = registration
             self.details = details
-            self.arguments = arguments
-            self.argumentsKw = argumentsKw
+            self.positionalArguments = positionalArguments
+            self.namedArguments = namedArguments
         }
 
         // [INVOCATION, Request|id, REGISTERED.Registration|id, Details|dict]
@@ -487,28 +500,31 @@ extension Message {
         public let request: WampID
         public let registration: WampID
         public let details: [String: ElementType]
-        public let arguments: [ElementType]?
-        public let argumentsKw: [String: ElementType]?
+        public let positionalArguments: [ElementType]?
+        public let namedArguments: [String: ElementType]?
 
-        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .integer(registration.value), .dict(details), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public var asList: [ElementType] {
+            [.integer(Self.type), .integer(request.value), .integer(registration.value), .dict(details)]
+                + parseArguments(positional: positionalArguments, named: namedArguments)
+        }
         public static func from(list: [ElementType]) -> Message.Invocation? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let registration = list[safe: 2]?.integer.map(WampID.init(rawValue:)),
                   let details = list[safe: 3]?.dict
             else { return nil }
-            let arguments = list[safe: 4]?.list ?? list[safe: 5]?.list
-            let argumentsKw = list[safe: 4]?.dict ?? list[safe: 5]?.dict
-            return .init(request: request, registration: registration, details: details, arguments: arguments, argumentsKw: argumentsKw)
+            let positionalArguments = list[safe: 4]?.list ?? list[safe: 5]?.list
+            let namedArguments = list[safe: 4]?.dict ?? list[safe: 5]?.dict
+            return .init(request: request, registration: registration, details: details, positionalArguments: positionalArguments, namedArguments: namedArguments)
         }
     }
 
     public struct Yield: ElementTypeConvertible, Equatable {
-        public init(request: WampID, options: [String : ElementType], arguments: [ElementType]?, argumentsKw: [String : ElementType]?) {
+        public init(request: WampID, options: [String : ElementType], positionalArguments: [ElementType]?, namedArguments: [String : ElementType]?) {
             self.request = request
             self.options = options
-            self.arguments = arguments
-            self.argumentsKw = argumentsKw
+            self.positionalArguments = positionalArguments
+            self.namedArguments = namedArguments
         }
 
         // [YIELD, INVOCATION.Request|id, Options|dict]
@@ -517,18 +533,30 @@ extension Message {
         public static let type: MessageType = 70
         public let request: WampID
         public let options: [String: ElementType]
-        public let arguments: [ElementType]?
-        public let argumentsKw: [String: ElementType]?
+        public let positionalArguments: [ElementType]?
+        public let namedArguments: [String: ElementType]?
 
-        public var asList: [ElementType] { [.integer(Self.type), .integer(request.value), .dict(options), arguments.map(ElementType.list), argumentsKw.map(ElementType.dict)].compactMap(identity) }
+        public var asList: [ElementType] {
+            [.integer(Self.type), .integer(request.value), .dict(options)]
+                + parseArguments(positional: positionalArguments, named: namedArguments)
+        }
+
         public static func from(list: [ElementType]) -> Message.Yield? {
             guard list[safe: 0]?.integer == Self.type,
                   let request = list[safe: 1]?.integer.map(WampID.init(rawValue:)),
                   let options = list[safe: 2]?.dict
             else { return nil }
-            let arguments = list[safe: 3]?.list ?? list[safe: 4]?.list
-            let argumentsKw = list[safe: 3]?.dict ?? list[safe: 4]?.dict
-            return .init(request: request, options: options, arguments: arguments, argumentsKw: argumentsKw)
+            let positionalArguments = list[safe: 3]?.list ?? list[safe: 4]?.list
+            let namedArguments = list[safe: 3]?.dict ?? list[safe: 4]?.dict
+            return .init(request: request, options: options, positionalArguments: positionalArguments, namedArguments: namedArguments)
         }
     }
+}
+
+func parseArguments(positional: [ElementType]?, named: [String: ElementType]?) -> [ElementType] {
+    // If both are nil, we send no parameter
+    if positional == nil, named == nil { return [] }
+    // If any of them is not nil, positional is required
+    // But name is sent only if it's not nil
+    return [ElementType.list(positional ?? [])] + [named.map(ElementType.dict)].compactMap(identity)
 }

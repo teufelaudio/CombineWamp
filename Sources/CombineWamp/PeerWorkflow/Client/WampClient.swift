@@ -20,16 +20,16 @@ public struct WampClient {
         roles.contains(.publisher) ? WampPublisher(session: session) : nil
     }
 
-    public var asSubscriber: Void? {
-        roles.contains(.subscriber) ? { fatalError("Not implemented") }() : nil
+    public var asSubscriber: WampSubscriber? {
+        roles.contains(.subscriber) ? WampSubscriber(session: session) : nil
     }
 
-    public var asCaller: Void? {
-        roles.contains(.caller) ? { fatalError("Not implemented") }() : nil
+    public var asCaller: WampCaller? {
+        roles.contains(.caller) ? WampCaller(session: session) : nil
     }
 
-    public var asCallee: Void? {
-        roles.contains(.callee) ? { fatalError("Not implemented") }() : nil
+    public var asCallee: WampCallee? {
+        roles.contains(.callee) ? WampCallee(session: session) : nil
     }
 
     /// Client says HELLO, Router says WELCOME:
