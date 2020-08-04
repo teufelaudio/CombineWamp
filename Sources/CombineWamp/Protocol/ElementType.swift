@@ -1,23 +1,23 @@
 import Foundation
 
-internal protocol ElementTypeConvertible: Codable {
+public protocol ElementTypeConvertible: Codable {
     var asList: [ElementType] { get }
     static func from(list: [ElementType]) -> Self?
 }
 
 extension ElementTypeConvertible {
-    internal init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let list = try [ElementType].init(from: decoder)
         self = try Self.from(list: list) ?? { throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Can't parse list to \(Self.self)")) }()
     }
 
-    internal func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         let list = asList
         try list.encode(to: encoder)
     }
 }
 
-internal enum ElementType: Equatable {
+public enum ElementType: Equatable {
     case integer(Int)
     case string(String)
     case bool(Bool)
@@ -27,7 +27,7 @@ internal enum ElementType: Equatable {
 }
 
 extension ElementType {
-    internal var integer: Int? {
+    public var integer: Int? {
         get {
             guard case let .integer(value) = self else { return nil }
             return value
@@ -38,7 +38,7 @@ extension ElementType {
         }
     }
 
-    internal var string: String? {
+    public var string: String? {
         get {
             guard case let .string(value) = self else { return nil }
             return value
@@ -49,7 +49,7 @@ extension ElementType {
         }
     }
 
-    internal var bool: Bool? {
+    public var bool: Bool? {
         get {
             guard case let .bool(value) = self else { return nil }
             return value
@@ -60,7 +60,7 @@ extension ElementType {
         }
     }
 
-    internal var double: Double? {
+    public var double: Double? {
         get {
             guard case let .double(value) = self else { return nil }
             return value
@@ -71,7 +71,7 @@ extension ElementType {
         }
     }
 
-    internal var dict: [String: ElementType]? {
+    public var dict: [String: ElementType]? {
         get {
             guard case let .dict(value) = self else { return nil }
             return value
@@ -82,7 +82,7 @@ extension ElementType {
         }
     }
 
-    internal var list: [ElementType]? {
+    public var list: [ElementType]? {
         get {
             guard case let .list(value) = self else { return nil }
             return value
@@ -108,7 +108,7 @@ extension ElementType: Codable {
         }
     }
 
-    internal init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         if var listContainer = try? decoder.unkeyedContainer() {
             var items: [ElementType] = []
             while !listContainer.isAtEnd {
@@ -153,7 +153,7 @@ extension ElementType: Codable {
         throw DecodingError.dataCorruptedError(in: singleValueContainer, debugDescription: "Can't parse to any known type")
     }
 
-    internal func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         switch self {
         case let .integer(integer):
             try integer.encode(to: encoder)

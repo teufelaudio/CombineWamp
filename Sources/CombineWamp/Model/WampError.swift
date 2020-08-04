@@ -1,4 +1,4 @@
-public struct WampError {
+public struct WampError: Error {
     public let uri: URI
 
     private init(string: String) {
