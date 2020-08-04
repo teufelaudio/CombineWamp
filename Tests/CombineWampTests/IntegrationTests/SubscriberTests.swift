@@ -44,7 +44,7 @@ final class SubscriberTests: IntegrationTestBase {
 
         session
             .client
-            .asSubscriber?
+            .asSubscriber!
             .subscribe(topic: URI("com.myapp.hello")!, onUnsubscribe: { _ in })
             .sink(
                 receiveCompletion: { completion in
@@ -80,7 +80,7 @@ final class SubscriberTests: IntegrationTestBase {
 
         let subscription = session
             .client
-            .asSubscriber?
+            .asSubscriber!
             .subscribe(topic: URI("com.myapp.hello")!, onUnsubscribe: { [weak self] unsubscribing in
                 guard let self = self else { return }
                 unsubscribing
