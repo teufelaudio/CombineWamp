@@ -120,7 +120,7 @@ final class CallerTests: IntegrationTestBase {
         let resultReceived = expectation(description: "Result should have been received")
         session
             .client
-            .asCaller?
+            .asCaller!
             .call(procedure: URI("de.teufel.tests.sum")!, positionalArguments: [.integer(13), .integer(17)])
             .sink(
                 receiveCompletion: { completion in
@@ -149,7 +149,7 @@ final class CallerTests: IntegrationTestBase {
         let resultReceived = expectation(description: "Result should have been received")
         session
             .client
-            .asCaller?
+            .asCaller!
             .call(procedure: URI("de.teufel.tests.subtract")!, namedArguments: ["first": .integer(53), "second": .integer(11)])
             .sink(
                 receiveCompletion: { completion in

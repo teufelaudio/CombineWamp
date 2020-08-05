@@ -42,7 +42,7 @@ final class CalleeTests: IntegrationTestBase {
 
         let registration = session
             .client
-            .asCallee?
+            .asCallee!
             .register(procedure: URI("com.teufel.tests.sum_from_the_app")!, onUnregister: { unregistering in
                 unregistering
                     .run(
@@ -83,7 +83,7 @@ final class CalleeTests: IntegrationTestBase {
 
         session
             .client
-            .asCaller?
+            .asCaller!
             .call(procedure: URI("com.teufel.tests.sum_from_the_app")!, positionalArguments: [.integer(99), .integer(57)])
             .sink(
                 receiveCompletion: { completion in

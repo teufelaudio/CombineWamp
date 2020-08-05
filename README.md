@@ -40,7 +40,7 @@ let realm = URI("de.teufel.my_app.public_realm")!
 Please notice that CombineWamp works with strict URI rules (https://wamp-proto.org/_static/gen/wamp_latest.html#strict-uris).
 
 ## Session
-A session glues all these things together. You can think of it as a client connection. The same session can be reused by certain client to perform different actions, such as publishing, subscribing, calling RPC procedures or responding RPC procedures. A client may, if it want, also create more than a session, although this is not usually required.
+A session glues all these things together. You can think of it as a client connection. The same session can be reused by certain client to perform different actions, such as publishing, subscribing, calling RPC procedures or responding RPC procedures. A client, if it wants, may also create more than a session, although this is not usually required.
 ```swift
 let session = WampSession(transport: transport, serialization: serialization, realm: realm, roles: .allClientRoles)
 ```

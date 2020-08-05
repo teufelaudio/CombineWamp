@@ -63,7 +63,7 @@ extension URI {
     public struct SerializationFormat {
         public let uri: URI
 
-        static var json = SerializationFormat(uri: URI(unverified: "wamp.2.json"))
-        static var msgpack = SerializationFormat(uri: URI(unverified: "wamp.2.msgpack"))
+        static let json = SerializationFormat(uri: URI(unverified: "wamp.2.json"))
+        static let msgpack = SerializationFormat(uri: URI(unverified: "wamp.2.msgpack"))
     }
 }
