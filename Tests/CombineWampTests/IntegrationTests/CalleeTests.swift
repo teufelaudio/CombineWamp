@@ -104,7 +104,7 @@ final class CalleeTests: IntegrationTestBase {
 
         wait(for: [invocationExpectation, successfulYieldExpectation, resultReceived], timeout: 2.0, enforceOrder: true)
 
-        registration?.cancel()
+        registration.cancel()
         wait(for: [unregistrationExpectation], timeout: 1.0)
         XCTAssertNotNil(connection)
     }

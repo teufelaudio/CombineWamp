@@ -110,7 +110,7 @@ final class SubscriberTests: IntegrationTestBase {
 
         wait(for: [receiveEventsExpectation], timeout: 2.0)
 
-        subscription?.cancel()
+        subscription.cancel()
         wait(for: [unsubscribingExpectation], timeout: 1.0)
     }
 }
