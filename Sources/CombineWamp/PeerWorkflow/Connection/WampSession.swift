@@ -9,7 +9,7 @@ public class WampSession: Cancellable {
     private let transport: WampTransport
     private let serialization: WampSerializing
     let messageBus = PassthroughSubject<Message, Never>()
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
     let idGenerator = WampID.createGlobalScopeIDs()
     private let roles: Set<WampRole>
 

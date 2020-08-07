@@ -45,15 +45,13 @@ final class CalleeTests: IntegrationTestBase {
             .asCallee!
             .register(procedure: URI("com.teufel.tests.sum_from_the_app")!, onUnregister: { unregistering in
                 unregistering
-                    .run(
-                        onSuccess: { unregistered in
+                    .analysis(
+                        ifSuccess: { unregistered in
                             unregistrationExpectation.fulfill()
                         },
-                        onFailure: { error in
+                        ifFailure: { error in
                             XCTFail(error.localizedDescription)
-                        }
-                    )
-                    .store(in: &cancellables)
+                        })
             })
             .handleEvents(receiveSubscription: { _ in registrationExpectation.fulfill() })
             .sink(

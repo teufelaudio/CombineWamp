@@ -10,8 +10,9 @@ public struct WampSubscriber {
         self.session = session
     }
 
-    public func subscribe(topic: URI, onUnsubscribe: @escaping (Publishers.Promise<Message.Unsubscribed, ModuleError>) -> Void)
+    public func subscribe(topic: URI, onUnsubscribe: @escaping (Result<Message.Unsubscribed, ModuleError>) -> Void = { _ in })
     -> AnyPublisher<Message.Event, ModuleError> {
+        let session = self.session
         guard let id = session.idGenerator.next() else { return Fail(error: .sessionIsNotValid).eraseToAnyPublisher() }
         let messageBus = session.messageBus
 
@@ -45,8 +46,17 @@ public struct WampSubscriber {
                     return event
                 }
                 .handleEvents(
-                    receiveCancel: {
-                        onUnsubscribe(self.unsubscribe(subscription: subscribedMessage.subscription))
+                    receiveCancel: { [weak session] in
+                        guard let session = session else {
+                            onUnsubscribe(.failure(.sessionIsNotValid))
+                            return
+                        }
+                        self.unsubscribe(subscription: subscribedMessage.subscription)
+                            .run(onSuccess: { onUnsubscribe(.success($0)) },
+                                 onFailure: { onUnsubscribe(.failure($0)) }
+                            )
+                            .store(in: &session.cancellables)
+
                     }
                 )
                 .eraseToAnyPublisher()

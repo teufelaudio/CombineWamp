@@ -10,7 +10,7 @@ public struct WampCallee {
         self.session = session
     }
 
-    public func register(procedure: URI, onUnregister: @escaping (Publishers.Promise<Message.Unregistered, ModuleError>) -> Void)
+    public func register(procedure: URI, onUnregister: @escaping (Result<Message.Unregistered, ModuleError>) -> Void = { _ in })
     -> AnyPublisher<(invocation: Message.Invocation, responder: ([ElementType]) -> Publishers.Promise<Void, ModuleError>), ModuleError> {
         let session = self.session
         guard let id = session.idGenerator.next() else { return Fail(error: .sessionIsNotValid).eraseToAnyPublisher() }
@@ -52,8 +52,15 @@ public struct WampCallee {
                         })
                 }
                 .handleEvents(
-                    receiveCancel: {
-                        onUnregister(self.unregister(registration: registeredMessage.registration))
+                    receiveCancel: { [weak session] in
+                        guard let session = session else {
+                            onUnregister(.failure(.sessionIsNotValid))
+                            return
+                        }
+                        self.unregister(registration: registeredMessage.registration)
+                            .run(onSuccess: { onUnregister(.success($0)) },
+                                 onFailure: { onUnregister(.failure($0)) })
+                            .store(in: &session.cancellables)
                     }
                 )
                 .eraseToAnyPublisher()
