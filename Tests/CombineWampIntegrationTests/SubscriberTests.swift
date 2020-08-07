@@ -81,18 +81,16 @@ final class SubscriberTests: IntegrationTestBase {
         let subscription = session
             .client
             .asSubscriber!
-            .subscribe(topic: URI("com.myapp.hello")!, onUnsubscribe: { [weak self] unsubscribing in
-                guard let self = self else { return }
+            .subscribe(topic: URI("com.myapp.hello")!, onUnsubscribe: { unsubscribing in
                 unsubscribing
-                    .run(
-                        onSuccess: { unsubscribed in
+                    .analysis(
+                        ifSuccess: { unsubscribed in
                             unsubscribingExpectation.fulfill()
                         },
-                        onFailure: { error in
+                        ifFailure: { error in
                             XCTFail(error.localizedDescription)
                         }
                     )
-                    .store(in: &self.cancellables)
             })
             .sink(
                 receiveCompletion: { completion in

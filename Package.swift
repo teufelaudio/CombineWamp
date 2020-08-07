@@ -14,6 +14,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "CombineWamp", dependencies: ["CombineWebSocket", "FoundationExtensions"]),
-        .testTarget(name: "CombineWampTests", dependencies: ["CombineWamp"])
+        .testTarget(name: "CombineWampTests", dependencies: ["CombineWamp"]),
+        .testTarget(name: "CombineWampIntegrationTests", dependencies: ["CombineWamp"])
     ]
 )

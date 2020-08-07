@@ -129,18 +129,11 @@ Lifts a Client to a Subscriber and allows subscribing to topics in the WAMP Real
 session
     .client
     .asSubscriber?
-    .subscribe(topic: URI("de.teufel.my_app.hello_topic")!, onUnsubscribe: { [weak self] unsubscribing in
-        guard let self = self else { return }
-        unsubscribing
-            .run(
-                onSuccess: { unsubscribed in
-                    // Successfully unsubscribed
-                },
-                onFailure: { error in
-                    // Handle unsubscribe error
-                }
-            )
-            .store(in: &self.cancellables)
+    .subscribe(topic: URI("de.teufel.my_app.hello_topic")!, onUnsubscribe: { unsubscribing in
+        switch unsubscribing {
+        case .success: break // Successfully unsubscribed
+        case let .failure(error): break // Handle unsubscribe error
+        }
     })
     .sink(
         receiveCompletion: { [weak self] completion in
@@ -157,7 +150,7 @@ session
 
 Please notice that `session.client.asSubscriber` returns an Optional `WampSubscriber`. This will be nil in case you didn't set `.subscriber` role on creating the `WampSession`.
 
-It's important to provide a `onUnsubscribe` closure that in fact uses the promise given to you. This will ensure that an UNSUBSCRIBE message is sent to the router when this Combine subscription is cancelled. Be sure to use a valid `Set<AnyCancellable>`, and not one that was already disposed, or the UNSUBSCRIBE message won't be sent.
+When this Combine subscription is cancelled, if the session is still active the client will send an UNSUBSCRIBE message to the router informing that we're no longer interested in this topic. You can optionally check if this message was properly delivered, by providing the closure `onUnsubscribe`.
 
 For the possible element types, please check [Element Types](#element-types) section below.
 
@@ -198,16 +191,10 @@ session
     .client
     .asCallee?
     .register(procedure: URI("de.teufel.my_app.sum")!, onUnregister: { unregistering in
-        unregistering
-            .run(
-                onSuccess: { unregistered in
-                    // Successfully unregistered
-                },
-                onFailure: { error in
-                    // Handle unregister error
-                }
-            )
-            .store(in: &cancellables)
+        switch unregistering {
+        case .success: break // Successfully unregistered
+        case let .failure(error): break // Handle unregister error
+        }
     })
     .sink(
         receiveCompletion: { [weak self] completion in
@@ -232,7 +219,7 @@ session
 
 Please notice that `session.client.asCallee` returns an Optional `WampCallee`. This will be nil in case you didn't set `.callee` role on creating the `WampSession`.
 
-It's important to provide a `onUnregister` closure that in fact uses the promise given to you. This will ensure that an UNREGISTER message is sent to the router when this Combine subscription is cancelled. Be sure to use a valid `Set<AnyCancellable>`, and not one that was already disposed, or the UNREGISTER message won't be sent.
+When this Combine subscription is cancelled, if the session is still active the client will send an UNREGISTER message to the router informing that we're no longer offering in this procedure. You can optionally check if this message was properly delivered, by providing the closure `onUnregister`.
 
 For the possible element types, please check [Element Types](#element-types) section below.
 
