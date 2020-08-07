@@ -30,14 +30,14 @@ public struct WampTransport: ConnectablePublisher {
     public func connect() -> Cancellable {
         _connect()
             .handleEvents(receiveRequest: { _ in
-                events.send(.connected)
+                self.events.send(.connected)
             })
             .sink(
                 receiveCompletion: { completion in
-                    events.send(completion: completion)
+                    self.events.send(completion: completion)
                 },
                 receiveValue: { message in
-                    events.send(.incomingMessage(message))
+                    self.events.send(.incomingMessage(message))
                 }
             )
     }

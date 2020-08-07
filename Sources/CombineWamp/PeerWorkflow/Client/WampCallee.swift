@@ -12,6 +12,7 @@ public struct WampCallee {
 
     public func register(procedure: URI, onUnregister: @escaping (Publishers.Promise<Message.Unregistered, ModuleError>) -> Void)
     -> AnyPublisher<(invocation: Message.Invocation, responder: ([ElementType]) -> Publishers.Promise<Void, ModuleError>), ModuleError> {
+        let session = self.session
         guard let id = session.idGenerator.next() else { return Fail(error: .sessionIsNotValid).eraseToAnyPublisher() }
         let messageBus = session.messageBus
 
@@ -52,7 +53,7 @@ public struct WampCallee {
                 }
                 .handleEvents(
                     receiveCancel: {
-                        onUnregister(unregister(registration: registeredMessage.registration))
+                        onUnregister(self.unregister(registration: registeredMessage.registration))
                     }
                 )
                 .eraseToAnyPublisher()

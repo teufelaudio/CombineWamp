@@ -46,7 +46,7 @@ public struct WampSubscriber {
                 }
                 .handleEvents(
                     receiveCancel: {
-                        onUnsubscribe(unsubscribe(subscription: subscribedMessage.subscription))
+                        onUnsubscribe(self.unsubscribe(subscription: subscribedMessage.subscription))
                     }
                 )
                 .eraseToAnyPublisher()
