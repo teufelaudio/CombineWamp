@@ -37,7 +37,7 @@ final class PublisherTests: IntegrationTestBase {
         let publishedReceived = expectation(description: "Published should have been received")
         session
             .client
-            .asPublisher?
+            .asPublisher!
             .publish(topic: URI("com.myapp.hello")!, positionalArguments: [.string("Hello World 42")])
             .sink(
                 receiveCompletion: { completion in
@@ -64,7 +64,7 @@ final class PublisherTests: IntegrationTestBase {
         let publishedReceived = expectation(description: "Published should have been received")
         session
             .client
-            .asPublisher?
+            .asPublisher!
             .publishWithoutAck(topic: URI("com.myapp.hello")!, positionalArguments: [.string("Hello World 42")])
             .sink(
                 receiveCompletion: { completion in
@@ -90,7 +90,7 @@ final class PublisherTests: IntegrationTestBase {
         let errorReceived = expectation(description: "Error should have been received")
         session
             .client
-            .asPublisher?
+            .asPublisher!
             .publish(topic: URI(unverified: ".myapp.hello..a"), positionalArguments: [.string("Hello World 42")])
             .sink(
                 receiveCompletion: { completion in
