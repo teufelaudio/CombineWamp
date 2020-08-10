@@ -49,7 +49,7 @@ public struct WampTransport: ConnectablePublisher {
 
 // Implementations (Protocol witnesses)
 extension WampTransport {
-    public static func webSocket(wsURL: URL, urlSession: URLSession, serializationFormat: URI.SerializationFormat) -> WampTransport {
+    public static func webSocket(wsURL: URL, urlSession: WebSocketSessionProtocol, serializationFormat: URI.SerializationFormat) -> WampTransport {
         let webSocket = urlSession.webSocket(with: wsURL, protocols: [serializationFormat.uri.description])
 
         return WampTransport(
