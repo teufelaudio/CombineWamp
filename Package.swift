@@ -9,8 +9,8 @@ let package = Package(
         .library(name: "CombineWamp", targets: ["CombineWamp"])
     ],
     dependencies: [
-        .package(url: "https://github.com/teufelaudio/CombineWebSocket", .branch("master")),
-        .package(url: "https://github.com/teufelaudio/FoundationExtensions", .branch("master"))
+        .package(url: "https://github.com/teufelaudio/CombineWebSocket.git", .branch("master")),
+        .package(url: "https://github.com/teufelaudio/FoundationExtensions.git", .branch("master"))
     ],
     targets: [
         .target(name: "CombineWamp", dependencies: ["CombineWebSocket", "FoundationExtensions"]),
