@@ -10,10 +10,16 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/teufelaudio/CombineWebSocket.git", .branch("master")),
-        .package(url: "https://github.com/teufelaudio/FoundationExtensions.git", .branch("master"))
+        .package(url: "https://github.com/teufelaudio/FoundationExtensions.git", .upToNextMajor(from: "0.1.4"))
     ],
     targets: [
-        .target(name: "CombineWamp", dependencies: ["CombineWebSocket", "FoundationExtensions"]),
+        .target(
+            name: "CombineWamp",
+            dependencies: [
+                "CombineWebSocket",
+                .product(name: "FoundationExtensions", package: "FoundationExtensions")
+            ]
+        ),
         .testTarget(name: "CombineWampTests", dependencies: ["CombineWamp"]),
         .testTarget(name: "CombineWampIntegrationTests", dependencies: ["CombineWamp"])
     ]
