@@ -2574,4 +2574,45 @@ extension MessageJSONTests {
         // then
         XCTAssertEqual(json, String(data: message, encoding: .utf8)!)
     }
+
+    func testResultWithNullDecoding() throws {
+        // given
+        let decoder = JSONDecoder()
+        let json = "[50, 5691108220851607, {}, [null], {}]".data(using: .utf8)!
+        let model = Message.result(
+            .init(
+                request: .init(integerLiteral: 5691108220851607),
+                details: [:],
+                positionalArguments: [.null],
+                namedArguments: [:]
+            )
+        )
+
+        // when
+        let message = try decoder.decode(Message.self, from: json)
+
+        // then
+        XCTAssertEqual(model, message)
+    }
+
+    func testResultWithNullEncoding() throws {
+        // given
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        let json = "[50,5691108220851607,{},[null],{}]"
+        let model = Message.result(
+            .init(
+                request: .init(integerLiteral: 5691108220851607),
+                details: [:],
+                positionalArguments: [.null],
+                namedArguments: [:]
+            )
+        )
+
+        // when
+        let message = try encoder.encode(model)
+
+        // then
+        XCTAssertEqual(json, String(data: message, encoding: .utf8)!)
+    }
 }

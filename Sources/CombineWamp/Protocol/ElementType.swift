@@ -18,6 +18,7 @@ extension ElementTypeConvertible {
 }
 
 public enum ElementType: Equatable {
+    case null
     case integer(Int)
     case string(String)
     case bool(Bool)
@@ -27,6 +28,13 @@ public enum ElementType: Equatable {
 }
 
 extension ElementType {
+    public var null: Void? {
+        get {
+            guard case .null = self else { return nil }
+            return ()
+        }
+    }
+
     public var integer: Int? {
         get {
             guard case let .integer(value) = self else { return nil }
@@ -150,11 +158,19 @@ extension ElementType: Codable {
             return
         }
 
+        if singleValueContainer.decodeNil() {
+            self = .null
+            return
+        }
+
         throw DecodingError.dataCorruptedError(in: singleValueContainer, debugDescription: "Can't parse to any known type")
     }
 
     public func encode(to encoder: Encoder) throws {
         switch self {
+        case .null:
+            var container = encoder.singleValueContainer()
+            try container.encodeNil()
         case let .integer(integer):
             try integer.encode(to: encoder)
         case let .string(string):
