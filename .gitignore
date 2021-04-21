@@ -3,3 +3,5 @@
 /Packages
 /*.xcodeproj
 xcuserdata/
+key.priv
+key.pub
