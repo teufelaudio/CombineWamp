@@ -33,8 +33,7 @@ public struct WampCallee {
 
                     return Empty().eraseToAnyPublisher()
                 }
-                .first()
-                .promise
+                .promise(onEmpty: { .failure(.sessionIsNotValid) })
         }
         .map { registeredMessage -> AnyPublisher<(invocation: Message.Invocation, responder: ([ElementType]) -> Publishers.Promise<Void, ModuleError>), ModuleError> in
             messageBus
@@ -96,8 +95,7 @@ public struct WampCallee {
 
                     return Empty().eraseToAnyPublisher()
                 }
-                .first()
-                .promise
+                .promise(onEmpty: { .failure(.sessionIsNotValid) })
         }
         .promise
     }

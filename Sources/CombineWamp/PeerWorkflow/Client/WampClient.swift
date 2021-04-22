@@ -80,9 +80,8 @@ public struct WampClient {
                         return .init(error: ModuleError.wampError(.protocolViolation))
                     }
                 }
-                .promise
+                .promise(onEmpty: { .failure(.sessionIsNotValid) })
         }
-        .promise
     }
 
     /// Client says GOODBYE, Router says GOODBYE:
@@ -115,9 +114,8 @@ public struct WampClient {
                 }
                 .first()
                 .setFailureType(to: ModuleError.self)
-                .promise
+                .promise(onEmpty: { .failure(.sessionIsNotValid) })
         }
-        .promise
     }
 
     /// Router says GOODBYE, we as Client must reply GOODBYE:

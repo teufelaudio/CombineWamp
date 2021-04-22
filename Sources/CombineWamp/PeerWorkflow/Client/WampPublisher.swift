@@ -32,8 +32,7 @@ public struct WampPublisher {
 
                     return Empty().eraseToAnyPublisher()
                 }
-                .first()
-                .promise
+                .promise(onEmpty: { .failure(.sessionIsNotValid) })
         }
         .promise
     }
