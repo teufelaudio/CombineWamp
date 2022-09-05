@@ -7,11 +7,11 @@ let package = Package(
     platforms: [.iOS(.v13), .tvOS(.v13), .macOS(.v10_15), .watchOS(.v6)],
     products: [
         .library(name: "CombineWamp", targets: ["CombineWamp"]),
-        .library(name: "CombineWampAllStatic", targets: ["CombineWampAllStatic"])
+        .library(name: "CombineWampDynamic", type: .dynamic, targets: ["CombineWamp"])
     ],
     dependencies: [
         .package(url: "https://github.com/teufelaudio/CombineWebSocket.git", .upToNextMajor(from: "0.1.1")),
-        .package(url: "https://github.com/teufelaudio/FoundationExtensions.git", .upToNextMajor(from: "0.1.7"))
+        .package(url: "https://github.com/teufelaudio/FoundationExtensions.git", .exact("0.1.17"))
     ],
     targets: [
         .target(
@@ -22,10 +22,10 @@ let package = Package(
             ]
         ),
         .target(
-            name: "CombineWampAllStatic",
+            name: "CombineWampDynamic",
             dependencies: [
                 "CombineWebSocket",
-                .product(name: "FoundationExtensionsStatic", package: "FoundationExtensions")
+                .product(name: "FoundationExtensionsDynamic", package: "FoundationExtensions")
             ]
         ),
         .testTarget(name: "CombineWampTests", dependencies: ["CombineWamp"]),
