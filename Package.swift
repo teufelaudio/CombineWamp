@@ -11,7 +11,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/teufelaudio/CombineWebSocket.git", .upToNextMajor(from: "0.1.1")),
-        .package(url: "https://github.com/teufelaudio/FoundationExtensions.git", .exact("0.1.17"))
+        .package(url: "https://github.com/teufelaudio/FoundationExtensions.git", .exact("0.1.19"))
     ],
     targets: [
         .target(
