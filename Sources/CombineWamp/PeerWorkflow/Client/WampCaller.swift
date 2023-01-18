@@ -2,11 +2,16 @@ import Combine
 import Foundation
 import FoundationExtensions
 
+public protocol WampCallerProtocol {
+    func call(procedure: URI, positionalArguments: [ElementType]?, namedArguments: [String : ElementType]?)
+    -> Publishers.Promise<Message.Result, ModuleError>
+}
+
 /// WAMP Caller is a WAMP Client role that allows this Peer to call RPC procedures
-public struct WampCaller {
+public struct WampCaller: WampCallerProtocol {
     let session: WampSession
 
-    init(session: WampSession) {
+    public init(session: WampSession) {
         self.session = session
     }
 

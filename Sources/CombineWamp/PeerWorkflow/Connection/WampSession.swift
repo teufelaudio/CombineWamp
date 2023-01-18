@@ -5,24 +5,21 @@ import FoundationExtensions
 /// A Session is a transient conversation between two Peers attached to a Realm and running over a Transport.
 /// https://wamp-proto.org/_static/gen/wamp_latest.html#realms-sessions-and-transports
 public class WampSession: Cancellable {
-    public let realm: URI
     private let transport: WampTransport
     private let serialization: WampSerializing
     let messageBus = PassthroughSubject<Message, Never>()
     var cancellables = Set<AnyCancellable>()
     let idGenerator = WampID.createGlobalScopeIDs()
-    private let roles: Set<WampRole>
-
+    private let clientFactory: (WampSession) -> WampClient
     public var client: WampClient {
-        WampClient(session: self, roles: roles)
+        clientFactory(self)
     }
 
     /// A Session is a transient conversation between two Peers attached to a Realm and running over a Transport.
-    public init(transport: WampTransport, serialization: WampSerializing, realm: URI, roles: Set<WampRole>) {
+    public init(transport: WampTransport, serialization: WampSerializing, client: @escaping (WampSession) -> WampClient) {
         self.transport = transport
         self.serialization = serialization
-        self.realm = realm
-        self.roles = roles
+        self.clientFactory = client
     }
 
     public func connect() -> AnyPublisher<Message.Welcome, ModuleError> {

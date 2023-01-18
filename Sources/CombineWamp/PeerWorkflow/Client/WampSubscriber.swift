@@ -2,14 +2,19 @@ import Combine
 import Foundation
 import FoundationExtensions
 
+public protocol WampSubscriberProtocol {
+    func subscribe(topic: URI, onUnsubscribe: @escaping (Result<Message.Unsubscribed, ModuleError>) -> Void)
+    -> AnyPublisher<Message.Event, ModuleError>
+}
+
 /// WAMP Subscriber is a WAMP Client role that allows this Peer to subscribe to a topic and receive events related to it
-public struct WampSubscriber {
+public struct WampSubscriber: WampSubscriberProtocol {
     let session: WampSession
 
-    init(session: WampSession) {
+    public init(session: WampSession) {
         self.session = session
     }
-
+    
     public func subscribe(topic: URI, onUnsubscribe: @escaping (Result<Message.Unsubscribed, ModuleError>) -> Void = { _ in })
     -> AnyPublisher<Message.Event, ModuleError> {
         let session = self.session

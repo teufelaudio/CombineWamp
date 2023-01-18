@@ -6,7 +6,7 @@ import FoundationExtensions
 public struct WampPublisher {
     let session: WampSession
 
-    init(session: WampSession) {
+    public init(session: WampSession) {
         self.session = session
     }
 

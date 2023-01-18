@@ -10,26 +10,44 @@ import FoundationExtensions
 public struct WampClient {
     let session: WampSession
     let roles: Set<WampRole>
+    let realm: URI
+    let publisherRole: () -> WampPublisher
+    let subscriberRole: () -> WampSubscriberProtocol
+    let callerRole: () -> WampCallerProtocol
+    let calleeRole: () -> WampCallee
 
-    init(session: WampSession, roles: Set<WampRole>) {
+    public init(
+        session: WampSession,
+        roles: Set<WampRole>,
+        realm: URI,
+        publisherRole: @escaping () -> WampPublisher,
+        subscriberRole: @escaping () -> WampSubscriberProtocol,
+        callerRole: @escaping () -> WampCallerProtocol,
+        calleeRole: @escaping () -> WampCallee
+    ) {
         self.session = session
         self.roles = roles
+        self.realm = realm
+        self.publisherRole = publisherRole
+        self.subscriberRole = subscriberRole
+        self.callerRole = callerRole
+        self.calleeRole = calleeRole
     }
 
     public var asPublisher: WampPublisher? {
-        roles.contains(.publisher) ? WampPublisher(session: session) : nil
+        roles.contains(.publisher) ? publisherRole() : nil
     }
 
-    public var asSubscriber: WampSubscriber? {
-        roles.contains(.subscriber) ? WampSubscriber(session: session) : nil
+    public var asSubscriber: WampSubscriberProtocol? {
+        roles.contains(.subscriber) ? subscriberRole() : nil
     }
 
-    public var asCaller: WampCaller? {
-        roles.contains(.caller) ? WampCaller(session: session) : nil
+    public var asCaller: WampCallerProtocol? {
+        roles.contains(.caller) ? callerRole() : nil
     }
 
     public var asCallee: WampCallee? {
-        roles.contains(.callee) ? WampCallee(session: session) : nil
+        roles.contains(.callee) ? calleeRole() : nil
     }
 
     /// Client says HELLO, Router says WELCOME:
@@ -64,7 +82,7 @@ public struct WampClient {
         let messageBus = session.messageBus
 
         return session.send(
-            Message.hello(.init(realm: session.realm, details: .roles(roles)))
+            Message.hello(.init(realm: realm, details: .roles(roles)))
         )
         .flatMap { _ in
             messageBus
