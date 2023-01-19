@@ -3,10 +3,14 @@
 import Combine
 import Foundation
 
-class WampCallerMock: WampCallerProtocol {
-    var onReceiveCall: (CombineWamp.URI, [CombineWamp.ElementType]?, [String : CombineWamp.ElementType]?) -> Publishers.Promise<CombineWamp.Message.Result, CombineWamp.ModuleError> = { _, _, _ in fatalError() }
-        
-    func call(procedure: CombineWamp.URI, positionalArguments: [CombineWamp.ElementType]?, namedArguments: [String : CombineWamp.ElementType]?) -> Publishers.Promise<CombineWamp.Message.Result, CombineWamp.ModuleError> {
+public class WampCallerMock: WampCallerProtocol {
+
+    public var onReceiveCall: (URI, [ElementType]?, [String : ElementType]?) -> Publishers.Promise<Message.Result, ModuleError> = { _, _, _ in fatalError() }
+
+    public init() {
+    }
+
+    public func call(procedure: URI, positionalArguments: [ElementType]?, namedArguments: [String : ElementType]?) -> Publishers.Promise<Message.Result, ModuleError> {
         onReceiveCall(procedure, positionalArguments, namedArguments)
     }
 }

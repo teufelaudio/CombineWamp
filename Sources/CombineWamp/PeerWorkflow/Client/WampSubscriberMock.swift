@@ -3,9 +3,13 @@
 import Combine
 import Foundation
 
-class WampSubscriberMock: WampSubscriberProtocol {
-    var onReceiveSubscribe: (CombineWamp.URI, @escaping (Result<CombineWamp.Message.Unsubscribed, CombineWamp.ModuleError>) -> Void) -> AnyPublisher<CombineWamp.Message.Event, CombineWamp.ModuleError> = { _, _ in fatalError() }
-    func subscribe(topic: CombineWamp.URI, onUnsubscribe: @escaping (Result<CombineWamp.Message.Unsubscribed, CombineWamp.ModuleError>) -> Void) -> AnyPublisher<CombineWamp.Message.Event, CombineWamp.ModuleError> {
+public class WampSubscriberMock: WampSubscriberProtocol {
+    public var onReceiveSubscribe: (URI, @escaping (Result<Message.Unsubscribed, ModuleError>) -> Void) -> AnyPublisher<Message.Event, ModuleError> = { _, _ in fatalError() }
+
+    public init() {
+    }
+
+    public func subscribe(topic: URI, onUnsubscribe: @escaping (Result<Message.Unsubscribed, ModuleError>) -> Void) -> AnyPublisher<Message.Event, ModuleError> {
         onReceiveSubscribe(topic, onUnsubscribe)
     }
 }
