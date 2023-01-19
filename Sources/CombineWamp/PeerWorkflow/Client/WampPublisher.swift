@@ -2,8 +2,13 @@ import Combine
 import Foundation
 import FoundationExtensions
 
+public protocol WampPublisherProtocol {
+    func publish(topic: URI, positionalArguments: [ElementType]?, namedArguments: [String : ElementType]?)
+    -> Publishers.Promise<Message.Published, ModuleError>
+}
+
 /// WAMP Publisher is a WAMP Client role that allows this Peer to publish messages into a topic
-public struct WampPublisher {
+public struct WampPublisher: WampPublisherProtocol {
     let session: WampSession
 
     public init(session: WampSession) {

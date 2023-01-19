@@ -6,6 +6,7 @@ import XCTest
 final class CalleeTests: IntegrationTestBase {
     var connected: XCTestExpectation!
     var session: WampSession!
+    var client: ((WampSession) -> WampClient)!
     let realm = URI("realm1")!
     var connection: AnyCancellable?
 
@@ -13,7 +14,18 @@ final class CalleeTests: IntegrationTestBase {
         super.setUp()
 
         connected = expectation(description: "Connected")
-        session = WampSession(transport: transport(), serialization: serialization, realm: realm, roles: .allClientRoles)
+        client = { session in
+            WampClient(
+                session: session,
+                roles: [],
+                realm: URI(rawValue: "")!,
+                publisherRole: { fatalError() },
+                subscriberRole: { fatalError() },
+                callerRole: { fatalError() },
+                calleeRole: { fatalError() }
+            )
+        }
+        session = WampSession(transport: transport(), serialization: serialization, client: client)
         connection = session.connect()
             .sink(
                 receiveCompletion: { completion in
@@ -82,7 +94,9 @@ final class CalleeTests: IntegrationTestBase {
         session
             .client
             .asCaller!
-            .call(procedure: URI("com.teufel.tests.sum_from_the_app")!, positionalArguments: [.integer(99), .integer(57)])
+            .call(procedure: URI("com.teufel.tests.sum_from_the_app")!,
+                  positionalArguments: [.integer(99), .integer(57)],
+                  namedArguments: nil)
             .sink(
                 receiveCompletion: { completion in
                     switch completion {

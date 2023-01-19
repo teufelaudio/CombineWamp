@@ -11,19 +11,19 @@ public struct WampClient {
     let session: WampSession
     let roles: Set<WampRole>
     let realm: URI
-    let publisherRole: () -> WampPublisher
+    let publisherRole: () -> WampPublisherProtocol
     let subscriberRole: () -> WampSubscriberProtocol
     let callerRole: () -> WampCallerProtocol
-    let calleeRole: () -> WampCallee
+    let calleeRole: () -> WampCalleeProtocol
 
     public init(
         session: WampSession,
         roles: Set<WampRole>,
         realm: URI,
-        publisherRole: @escaping () -> WampPublisher,
+        publisherRole: @escaping () -> WampPublisherProtocol,
         subscriberRole: @escaping () -> WampSubscriberProtocol,
         callerRole: @escaping () -> WampCallerProtocol,
-        calleeRole: @escaping () -> WampCallee
+        calleeRole: @escaping () -> WampCalleeProtocol
     ) {
         self.session = session
         self.roles = roles
@@ -34,7 +34,7 @@ public struct WampClient {
         self.calleeRole = calleeRole
     }
 
-    public var asPublisher: WampPublisher? {
+    public var asPublisher: WampPublisherProtocol? {
         roles.contains(.publisher) ? publisherRole() : nil
     }
 
@@ -46,7 +46,7 @@ public struct WampClient {
         roles.contains(.caller) ? callerRole() : nil
     }
 
-    public var asCallee: WampCallee? {
+    public var asCallee: WampCalleeProtocol? {
         roles.contains(.callee) ? calleeRole() : nil
     }
 

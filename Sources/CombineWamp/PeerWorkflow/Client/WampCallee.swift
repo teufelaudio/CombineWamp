@@ -2,8 +2,13 @@ import Combine
 import Foundation
 import FoundationExtensions
 
+public protocol WampCalleeProtocol {
+    func register(procedure: URI, onUnregister: @escaping (Result<Message.Unregistered, ModuleError>) -> Void)
+    -> AnyPublisher<(invocation: Message.Invocation, responder: ([ElementType]) -> Publishers.Promise<Void, ModuleError>), ModuleError>
+}
+
 /// WAMP Callee is a WAMP Client role that allows this Peer to register RPC procedures and respond to their calls
-public struct WampCallee {
+public struct WampCallee: WampCalleeProtocol {
     let session: WampSession
 
     public init(session: WampSession) {
