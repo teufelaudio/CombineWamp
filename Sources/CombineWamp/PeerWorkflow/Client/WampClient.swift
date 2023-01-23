@@ -11,43 +11,48 @@ public struct WampClient {
     let session: WampSession
     let roles: Set<WampRole>
     let realm: URI
-    let publisherRole: () -> WampPublisherProtocol
-    let subscriberRole: () -> WampSubscriberProtocol
-    let callerRole: () -> WampCallerProtocol
-    let calleeRole: () -> WampCalleeProtocol
+    let publisherRole: (() -> WampPublisherProtocol)?
+    let subscriberRole: (() -> WampSubscriberProtocol)?
+    let callerRole: (() -> WampCallerProtocol)?
+    let calleeRole: (() -> WampCalleeProtocol)?
 
     public init(
         session: WampSession,
-        roles: Set<WampRole>,
         realm: URI,
-        publisherRole: @escaping () -> WampPublisherProtocol,
-        subscriberRole: @escaping () -> WampSubscriberProtocol,
-        callerRole: @escaping () -> WampCallerProtocol,
-        calleeRole: @escaping () -> WampCalleeProtocol
+        publisherRole: (() -> WampPublisherProtocol)? = nil,
+        subscriberRole: (() -> WampSubscriberProtocol)? = nil,
+        callerRole: (() -> WampCallerProtocol)? = nil,
+        calleeRole: (() -> WampCalleeProtocol)? = nil
     ) {
         self.session = session
-        self.roles = roles
         self.realm = realm
         self.publisherRole = publisherRole
         self.subscriberRole = subscriberRole
         self.callerRole = callerRole
         self.calleeRole = calleeRole
+
+        var internalRoles: Set<WampRole> = []
+        if publisherRole != nil { internalRoles.insert(.publisher) }
+        if subscriberRole != nil { internalRoles.insert(.subscriber) }
+        if callerRole != nil { internalRoles.insert(.caller) }
+        if calleeRole != nil { internalRoles.insert(.callee) }
+        self.roles = internalRoles
     }
 
     public var asPublisher: WampPublisherProtocol? {
-        roles.contains(.publisher) ? publisherRole() : nil
+        publisherRole?()
     }
 
     public var asSubscriber: WampSubscriberProtocol? {
-        roles.contains(.subscriber) ? subscriberRole() : nil
+        subscriberRole?()
     }
 
     public var asCaller: WampCallerProtocol? {
-        roles.contains(.caller) ? callerRole() : nil
+        callerRole?()
     }
 
     public var asCallee: WampCalleeProtocol? {
-        roles.contains(.callee) ? calleeRole() : nil
+        calleeRole?()
     }
 
     /// Client says HELLO, Router says WELCOME:

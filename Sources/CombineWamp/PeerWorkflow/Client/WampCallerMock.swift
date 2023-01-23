@@ -3,8 +3,8 @@
 import Combine
 import Foundation
 
+#if DEBUG
 public class WampCallerMock: WampCallerProtocol {
-
     public var onReceiveCall: (URI, [ElementType]?, [String : ElementType]?) -> Publishers.Promise<Message.Result, ModuleError> = { _, _, _ in fatalError() }
 
     public init() {
@@ -14,3 +14,4 @@ public class WampCallerMock: WampCallerProtocol {
         onReceiveCall(procedure, positionalArguments, namedArguments)
     }
 }
+#endif
