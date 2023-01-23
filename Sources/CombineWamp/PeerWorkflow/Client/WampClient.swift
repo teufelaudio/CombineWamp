@@ -10,26 +10,49 @@ import FoundationExtensions
 public struct WampClient {
     let session: WampSession
     let roles: Set<WampRole>
+    let realm: URI
+    let publisherRole: (() -> WampPublisherProtocol)?
+    let subscriberRole: (() -> WampSubscriberProtocol)?
+    let callerRole: (() -> WampCallerProtocol)?
+    let calleeRole: (() -> WampCalleeProtocol)?
 
-    init(session: WampSession, roles: Set<WampRole>) {
+    public init(
+        session: WampSession,
+        realm: URI,
+        publisherRole: (() -> WampPublisherProtocol)? = nil,
+        subscriberRole: (() -> WampSubscriberProtocol)? = nil,
+        callerRole: (() -> WampCallerProtocol)? = nil,
+        calleeRole: (() -> WampCalleeProtocol)? = nil
+    ) {
         self.session = session
-        self.roles = roles
+        self.realm = realm
+        self.publisherRole = publisherRole
+        self.subscriberRole = subscriberRole
+        self.callerRole = callerRole
+        self.calleeRole = calleeRole
+
+        var internalRoles: Set<WampRole> = []
+        if publisherRole != nil { internalRoles.insert(.publisher) }
+        if subscriberRole != nil { internalRoles.insert(.subscriber) }
+        if callerRole != nil { internalRoles.insert(.caller) }
+        if calleeRole != nil { internalRoles.insert(.callee) }
+        self.roles = internalRoles
     }
 
-    public var asPublisher: WampPublisher? {
-        roles.contains(.publisher) ? WampPublisher(session: session) : nil
+    public var asPublisher: WampPublisherProtocol? {
+        publisherRole?()
     }
 
-    public var asSubscriber: WampSubscriber? {
-        roles.contains(.subscriber) ? WampSubscriber(session: session) : nil
+    public var asSubscriber: WampSubscriberProtocol? {
+        subscriberRole?()
     }
 
-    public var asCaller: WampCaller? {
-        roles.contains(.caller) ? WampCaller(session: session) : nil
+    public var asCaller: WampCallerProtocol? {
+        callerRole?()
     }
 
-    public var asCallee: WampCallee? {
-        roles.contains(.callee) ? WampCallee(session: session) : nil
+    public var asCallee: WampCalleeProtocol? {
+        calleeRole?()
     }
 
     /// Client says HELLO, Router says WELCOME:
@@ -64,7 +87,7 @@ public struct WampClient {
         let messageBus = session.messageBus
 
         return session.send(
-            Message.hello(.init(realm: session.realm, details: .roles(roles)))
+            Message.hello(.init(realm: realm, details: .roles(roles)))
         )
         .flatMap { _ in
             messageBus
