@@ -39,7 +39,7 @@ public struct URI: Equatable, RawRepresentable, CustomStringConvertible, Lossles
         self.isWildcard = wildcard.contains("..") || wildcard.hasPrefix(".") || wildcard.hasSuffix(".")
     }
 
-    init(unverified: String, isWildcard: Bool = false) {
+    public init(unverified: String, isWildcard: Bool = false) {
         self.rawValue = unverified
         self.isWildcard = isWildcard
     }
