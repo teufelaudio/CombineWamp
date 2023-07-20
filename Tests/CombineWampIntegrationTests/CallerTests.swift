@@ -97,7 +97,16 @@ final class CallerTests: IntegrationTestBase {
         super.setUp()
 
         connected = expectation(description: "Connected")
-        session = WampSession(transport: transport(), serialization: serialization, realm: realm, roles: .allClientRoles)
+        session = WampSession(transport: transport(), serialization: serialization, client: { session in
+            WampClient(
+                session: session,
+                realm: self.realm,
+                publisherRole: { WampPublisher(session: session) },
+                subscriberRole: { WampSubscriber(session: session) },
+                callerRole: { WampCaller(session: session) },
+                calleeRole: { WampCallee(session: session) }
+            )
+        })
         connection = session.connect()
             .sink(
                 receiveCompletion: { completion in
@@ -121,7 +130,7 @@ final class CallerTests: IntegrationTestBase {
         session
             .client
             .asCaller!
-            .call(procedure: URI("de.teufel.tests.sum")!, positionalArguments: [.integer(13), .integer(17)])
+            .call(procedure: URI("de.teufel.tests.sum")!, positionalArguments: [.integer(13), .integer(17)], namedArguments: nil)
             .sink(
                 receiveCompletion: { completion in
                     switch completion {
@@ -150,7 +159,7 @@ final class CallerTests: IntegrationTestBase {
         session
             .client
             .asCaller!
-            .call(procedure: URI("de.teufel.tests.subtract")!, namedArguments: ["first": .integer(53), "second": .integer(11)])
+            .call(procedure: URI("de.teufel.tests.subtract")!, positionalArguments: nil, namedArguments: ["first": .integer(53), "second": .integer(11)])
             .sink(
                 receiveCompletion: { completion in
                     switch completion {

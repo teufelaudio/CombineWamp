@@ -18,7 +18,16 @@ final class SubscriberTests: IntegrationTestBase {
         super.setUp()
 
         connected = expectation(description: "Connected")
-        session = WampSession(transport: transport(), serialization: serialization, realm: realm, roles: .allClientRoles)
+        session = WampSession(transport: transport(), serialization: serialization, client: { session in
+            WampClient(
+                session: session,
+                realm: self.realm,
+                publisherRole: { WampPublisher(session: session) },
+                subscriberRole: { WampSubscriber(session: session) },
+                callerRole: { WampCaller(session: session) },
+                calleeRole: { WampCallee(session: session) }
+            )
+        })
         connection = session.connect()
             .sink(
                 receiveCompletion: { completion in
