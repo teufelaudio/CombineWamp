@@ -14,6 +14,7 @@ public class WampSession: Cancellable {
     public var client: WampClient {
         clientFactory(self)
     }
+    private var isConnected: Bool = false
 
     /// A Session is a transient conversation between two Peers attached to a Realm and running over a Transport.
     public init(transport: WampTransport, serialization: WampSerializing, client: @escaping (WampSession) -> WampClient) {
@@ -41,6 +42,9 @@ public class WampSession: Cancellable {
                     case let .failure(error):
                         self?.didDisconnect(with: error)
                     }
+                },
+                receiveCancel: { [weak self] in
+                    self?.didDisconnect()
                 }
             )
             .mapError { _ in .wampError(WampError.networkFailure) }
@@ -57,7 +61,10 @@ public class WampSession: Cancellable {
     }
 
     func send(_ message: Message) -> Publishers.Promise<Void, ModuleError> {
-        serialization
+        guard isConnected else {
+            return .init(error: .sessionIsNotValid)
+        }
+        return serialization
             .serialize(message)
             .mapError { ModuleError.serializingError($0) }
             .promise
@@ -78,6 +85,7 @@ public class WampSession: Cancellable {
 
 extension WampSession {
     private func didConnect() {
+        self.isConnected = true
     }
 
     private func gotPossibleMessage(_ possibleMessage: String) {
@@ -100,9 +108,11 @@ extension WampSession {
     }
 
     private func didDisconnect() {
+        self.isConnected = false
     }
 
     private func didDisconnect(with error: Error) {
+        self.isConnected = false
     }
 
     private func cantParseMessage(error: Error) {
