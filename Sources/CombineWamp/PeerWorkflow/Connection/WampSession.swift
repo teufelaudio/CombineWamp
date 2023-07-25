@@ -14,7 +14,10 @@ public class WampSession: Cancellable {
     public var client: WampClient {
         clientFactory(self)
     }
-    private var isConnected: Bool = false
+
+    private var connected: Bool = false
+    /// Protects access to `connected` using a readers-writer lock (https://en.wikipedia.org/wiki/Readers–writer_lock).
+    private let connectedQueue = DispatchQueue(label: "WampSession.connected", attributes: .concurrent)
 
     /// A Session is a transient conversation between two Peers attached to a Realm and running over a Transport.
     public init(transport: WampTransport, serialization: WampSerializing, client: @escaping (WampSession) -> WampClient) {
@@ -84,8 +87,21 @@ public class WampSession: Cancellable {
 }
 
 extension WampSession {
+
+    public var isConnected: Bool {
+        connectedQueue.sync {
+            return connected
+        }
+    }
+
+    private func updateConnected(to connectedStatus: Bool) {
+        connectedQueue.async(flags: .barrier, execute: { [weak self] in
+            self?.connected = connectedStatus
+        })
+    }
+
     private func didConnect() {
-        self.isConnected = true
+        updateConnected(to: true)
     }
 
     private func gotPossibleMessage(_ possibleMessage: String) {
@@ -108,11 +124,11 @@ extension WampSession {
     }
 
     private func didDisconnect() {
-        self.isConnected = false
+        updateConnected(to: false)
     }
 
     private func didDisconnect(with error: Error) {
-        self.isConnected = false
+        updateConnected(to: false)
     }
 
     private func cantParseMessage(error: Error) {
