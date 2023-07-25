@@ -17,12 +17,11 @@ final class CalleeTests: IntegrationTestBase {
         client = { session in
             WampClient(
                 session: session,
-                roles: [],
-                realm: URI(rawValue: "")!,
-                publisherRole: { fatalError() },
-                subscriberRole: { fatalError() },
-                callerRole: { fatalError() },
-                calleeRole: { fatalError() }
+                realm: URI(rawValue: "foo")!,
+                publisherRole: { WampPublisher(session: session) },
+                subscriberRole: { WampSubscriber(session: session) },
+                callerRole: { WampCaller(session: session) },
+                calleeRole: { WampCallee(session: session) }
             )
         }
         session = WampSession(transport: transport(), serialization: serialization, client: client)

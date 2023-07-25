@@ -7,7 +7,16 @@ import XCTest
 final class SessionEstablishmentTests: IntegrationTestBase {
     func testSayHelloReceiveWelcome() throws {
         let realm = URI("realm1")!
-        let session = WampSession(transport: transport(), serialization: serialization, realm: realm, roles: .allClientRoles)
+        let session = WampSession(transport: transport(), serialization: serialization, client: { session in
+            WampClient(
+                session: session,
+                realm: realm,
+                publisherRole: { WampPublisher(session: session) },
+                subscriberRole: { WampSubscriber(session: session) },
+                callerRole: { WampCaller(session: session) },
+                calleeRole: { WampCallee(session: session) }
+            )
+        })
 
         let welcomeReceived = expectation(description: "it should receive welcome")
 
@@ -31,7 +40,16 @@ final class SessionEstablishmentTests: IntegrationTestBase {
 
     func testSayHelloReceiveAbort() throws {
         let realm = URI("invalid_realm_dude")!
-        let session = WampSession(transport: transport(), serialization: serialization, realm: realm, roles: .allClientRoles)
+        let session = WampSession(transport: transport(), serialization: serialization, client: { session in
+            WampClient(
+                session: session,
+                realm: realm,
+                publisherRole: { WampPublisher(session: session) },
+                subscriberRole: { WampSubscriber(session: session) },
+                callerRole: { WampCaller(session: session) },
+                calleeRole: { WampCallee(session: session) }
+            )
+        })
 
         let abortReceived = expectation(description: "it should receive abort")
 

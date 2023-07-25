@@ -15,6 +15,10 @@ public class WampSession: Cancellable {
         clientFactory(self)
     }
 
+    private var connected: Bool = false
+    /// Protects access to `connected` using a readers-writer lock (https://en.wikipedia.org/wiki/Readers–writer_lock).
+    private let connectedQueue = DispatchQueue(label: "WampSession.connected", attributes: .concurrent)
+
     /// A Session is a transient conversation between two Peers attached to a Realm and running over a Transport.
     public init(transport: WampTransport, serialization: WampSerializing, client: @escaping (WampSession) -> WampClient) {
         self.transport = transport
@@ -41,6 +45,9 @@ public class WampSession: Cancellable {
                     case let .failure(error):
                         self?.didDisconnect(with: error)
                     }
+                },
+                receiveCancel: { [weak self] in
+                    self?.didDisconnect()
                 }
             )
             .mapError { _ in .wampError(WampError.networkFailure) }
@@ -57,7 +64,10 @@ public class WampSession: Cancellable {
     }
 
     func send(_ message: Message) -> Publishers.Promise<Void, ModuleError> {
-        serialization
+        guard isConnected else {
+            return .init(error: .sessionIsNotValid)
+        }
+        return serialization
             .serialize(message)
             .mapError { ModuleError.serializingError($0) }
             .promise
@@ -77,7 +87,21 @@ public class WampSession: Cancellable {
 }
 
 extension WampSession {
+
+    public var isConnected: Bool {
+        connectedQueue.sync {
+            return connected
+        }
+    }
+
+    private func updateConnected(to connectedStatus: Bool) {
+        connectedQueue.async(flags: .barrier, execute: { [weak self] in
+            self?.connected = connectedStatus
+        })
+    }
+
     private func didConnect() {
+        updateConnected(to: true)
     }
 
     private func gotPossibleMessage(_ possibleMessage: String) {
@@ -100,9 +124,11 @@ extension WampSession {
     }
 
     private func didDisconnect() {
+        updateConnected(to: false)
     }
 
     private func didDisconnect(with error: Error) {
+        updateConnected(to: false)
     }
 
     private func cantParseMessage(error: Error) {
