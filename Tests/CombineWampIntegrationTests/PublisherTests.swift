@@ -14,7 +14,16 @@ final class PublisherTests: IntegrationTestBase {
         super.setUp()
 
         connected = expectation(description: "Connected")
-        session = WampSession(transport: transport(), serialization: serialization, realm: realm, roles: .allClientRoles)
+        session = WampSession(transport: transport(), serialization: serialization, client: { session in
+            WampClient(
+                session: session,
+                realm: self.realm,
+                publisherRole: { WampPublisher(session: session) },
+                subscriberRole: { WampSubscriber(session: session) },
+                callerRole: { WampCaller(session: session) },
+                calleeRole: { WampCallee(session: session) }
+            )
+        })
         connection = session.connect()
             .sink(
                 receiveCompletion: { completion in
@@ -38,7 +47,7 @@ final class PublisherTests: IntegrationTestBase {
         session
             .client
             .asPublisher!
-            .publish(topic: URI("com.myapp.hello")!, positionalArguments: [.string("Hello World 42")])
+            .publish(topic: URI("com.myapp.hello")!, positionalArguments: [.string("Hello World 42")], namedArguments: nil)
             .sink(
                 receiveCompletion: { completion in
                     switch completion {
@@ -65,7 +74,7 @@ final class PublisherTests: IntegrationTestBase {
         session
             .client
             .asPublisher!
-            .publishWithoutAck(topic: URI("com.myapp.hello")!, positionalArguments: [.string("Hello World 42")])
+            .publish(topic: URI("com.myapp.hello")!, positionalArguments: [.string("Hello World 42")], namedArguments: nil)
             .sink(
                 receiveCompletion: { completion in
                     switch completion {
@@ -91,7 +100,7 @@ final class PublisherTests: IntegrationTestBase {
         session
             .client
             .asPublisher!
-            .publish(topic: URI(unverified: ".myapp.hello..a"), positionalArguments: [.string("Hello World 42")])
+            .publish(topic: URI(unverified: ".myapp.hello..a"), positionalArguments: [.string("Hello World 42")], namedArguments: nil)
             .sink(
                 receiveCompletion: { completion in
                     switch completion {
