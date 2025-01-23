@@ -2,6 +2,7 @@
 
 import Combine
 import Foundation
+import FoundationExtensions
 
 #if DEBUG
 public class WampCallerMock: WampCallerProtocol {
