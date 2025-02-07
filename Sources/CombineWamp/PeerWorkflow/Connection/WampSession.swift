@@ -76,9 +76,9 @@ public class WampSession: Cancellable {
                 return self.transport
                     .send(message: message)
                     .mapError { _ in ModuleError.wampError(.networkFailure) }
-                    .promise
+
             }
-            .promise
+
     }
 
     public func cancel() {

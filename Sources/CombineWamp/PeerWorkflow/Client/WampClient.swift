@@ -103,7 +103,7 @@ public struct WampClient {
                         return .init(error: ModuleError.wampError(.protocolViolation))
                     }
                 }
-                .promise(onEmpty: { .failure(.sessionIsNotValid) })
+                .eraseToPromise(onEmpty: .failure(.sessionIsNotValid))
         }
     }
 
@@ -137,7 +137,7 @@ public struct WampClient {
                 }
                 .first()
                 .setFailureType(to: ModuleError.self)
-                .promise(onEmpty: { .failure(.sessionIsNotValid) })
+                .eraseToPromise(onEmpty: .failure(.sessionIsNotValid))
         }
     }
 

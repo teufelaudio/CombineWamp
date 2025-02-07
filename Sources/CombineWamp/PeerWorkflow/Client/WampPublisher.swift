@@ -37,9 +37,8 @@ public struct WampPublisher: WampPublisherProtocol {
 
                     return Empty().eraseToAnyPublisher()
                 }
-                .promise(onEmpty: { .failure(.sessionIsNotValid) })
+                .eraseToPromise(onEmpty: .failure(.sessionIsNotValid))
         }
-        .promise
     }
 
     public func publishWithoutAck(topic: URI, positionalArguments: [ElementType]? = nil, namedArguments: [String : ElementType]? = nil)

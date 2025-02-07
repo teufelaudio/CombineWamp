@@ -38,7 +38,7 @@ public struct WampCallee: WampCalleeProtocol {
 
                     return Empty().eraseToAnyPublisher()
                 }
-                .promise(onEmpty: { .failure(.sessionIsNotValid) })
+                .eraseToPromise(onEmpty: .failure(.sessionIsNotValid))
         }
         .map { registeredMessage -> AnyPublisher<(invocation: Message.Invocation, responder: ([ElementType]) -> Publishers.Promise<Void, ModuleError>), ModuleError> in
             messageBus
@@ -100,8 +100,7 @@ public struct WampCallee: WampCalleeProtocol {
 
                     return Empty().eraseToAnyPublisher()
                 }
-                .promise(onEmpty: { .failure(.sessionIsNotValid) })
+                .eraseToPromise(onEmpty: .failure(.sessionIsNotValid))
         }
-        .promise
     }
 }

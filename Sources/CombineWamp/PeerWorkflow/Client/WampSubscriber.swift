@@ -38,7 +38,7 @@ public struct WampSubscriber: WampSubscriberProtocol {
 
                     return Empty().eraseToAnyPublisher()
                 }
-                .promise(onEmpty: { .failure(.sessionIsNotValid) })
+                .eraseToPromise(onEmpty: .failure(.sessionIsNotValid))
         }
         .map { subscribedMessage -> AnyPublisher<Message.Event, ModuleError> in
             messageBus
@@ -90,8 +90,7 @@ public struct WampSubscriber: WampSubscriberProtocol {
 
                     return Empty().eraseToAnyPublisher()
                 }
-                .promise(onEmpty: { .failure(.sessionIsNotValid) })
+                .eraseToPromise(onEmpty: .failure(.sessionIsNotValid))
         }
-        .promise
     }
 }

@@ -37,8 +37,7 @@ public struct WampCaller: WampCallerProtocol {
 
                     return Empty().eraseToAnyPublisher()
                 }
-                .promise(onEmpty: { .failure(.sessionIsNotValid) })
+                .eraseToPromise(onEmpty: .failure(.sessionIsNotValid))
         }
-        .promise
     }
 }

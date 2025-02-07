@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.9
 
 import PackageDescription
 
@@ -10,8 +10,8 @@ let package = Package(
         .library(name: "CombineWampDynamic", type: .dynamic, targets: ["CombineWamp"])
     ],
     dependencies: [
-        .package(url: "https://github.com/teufelaudio/CombineWebSocket.git", .upToNextMajor(from: "0.1.1")),
-        .package(url: "https://github.com/teufelaudio/FoundationExtensions.git", .upToNextMajor(from: "1.1.1"))
+        .package(url: "https://github.com/teufelaudio/CombineWebSocket.git", from: "0.1.0"),
+        .package(url: "https://github.com/teufelaudio/FoundationExtensions.git", from: "2.0.0")
     ],
     targets: [
         .target(
