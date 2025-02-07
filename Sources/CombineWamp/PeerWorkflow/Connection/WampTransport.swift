@@ -66,9 +66,7 @@ extension WampTransport {
                 }.eraseToAnyPublisher()
             },
             send: { message in
-                webSocket
-                    .send(message)
-                    .promise
+                Publishers.Promise(webSocket.send(message))
             }
         )
     }
